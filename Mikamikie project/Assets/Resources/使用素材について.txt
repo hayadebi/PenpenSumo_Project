@@ -1,0 +1,7 @@
+ここに使用した素材、アセット等についてまとめます。
+■フォント
+・ranobePOP
+https://booth.pm/ja/items/2328262
+■アセット UI関連
+・Simple Free Pixel art styled UI pack
+https://assetstore.unity.com/packages/2d/gui/icons/simple-free-pixel-art-styled-ui-pack-165012?locale=ja-JP

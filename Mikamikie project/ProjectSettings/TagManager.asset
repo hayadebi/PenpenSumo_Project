@@ -3,7 +3,17 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - red
+  - player
+  - enemy
+  - ground
+  - wall
+  - no
+  - Ground
+  - Wall
+  - No
+  - Character
   layers:
   - Default
   - TransparentFX
@@ -13,10 +23,10 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
+  - Ground
+  - Wall
+  - Character
+  - No
   - 
   - 
   - 
