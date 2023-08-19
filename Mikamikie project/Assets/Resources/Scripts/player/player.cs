@@ -41,8 +41,8 @@ public class player : MonoBehaviour
     private GameObject cm;
     private Vector3 cm_vec;
     //操作ボタンに関する
-    private longbuttonclick upbtn;
-    private longbuttonclick downbtn;
+    //private longbuttonclick upbtn;
+    //private longbuttonclick downbtn;
     private longbuttonclick rightbtn;
     private longbuttonclick leftbtn;
 
@@ -67,8 +67,8 @@ public class player : MonoBehaviour
         cm = GameObject.Find("Main Camera");
         cm_vec = character.position - cm.transform.position;
 
-        upbtn = GameObject.Find(nameof(upbtn)).GetComponent<longbuttonclick>();
-        downbtn = GameObject.Find(nameof(downbtn)).GetComponent<longbuttonclick>();
+        //upbtn = GameObject.Find(nameof(upbtn)).GetComponent<longbuttonclick>();
+        //downbtn = GameObject.Find(nameof(downbtn)).GetComponent<longbuttonclick>();
         rightbtn = GameObject.Find(nameof(rightbtn)).GetComponent<longbuttonclick>();
         leftbtn = GameObject.Find(nameof(leftbtn)).GetComponent<longbuttonclick>();
     }
@@ -79,7 +79,7 @@ public class player : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (GManager.instance.walktrg && !GManager.instance.over && !stoptrg && (upbtn && downbtn && rightbtn && leftbtn))
+        if (GManager.instance.walktrg && !GManager.instance.over && !stoptrg && (rightbtn && leftbtn))
         {
             //重力部分
             if (rb.useGravity)
@@ -89,7 +89,7 @@ public class player : MonoBehaviour
             x_speed = 0;
             y_speed = -gravity;
             //----ここからは移動----
-            if (!movetrg && (rightbtn.push || leftbtn.push || upbtn.push || downbtn.push))
+            if (!movetrg && (rightbtn.push || leftbtn.push ))
             {
                 //この部分では歩きの効果音、アニメーションを操作
                 movetrg = true;
@@ -103,7 +103,7 @@ public class player : MonoBehaviour
             var inputZ = 0;
             if (rightbtn.push) inputX = 1;
             if (leftbtn.push) inputX = -1;
-            //if (upbtn.push) inputZ = 1;
+            //if (upbtn.push);
             //if (downbtn.push) inputZ = -1;
             var tempVc = new Vector3(move_num * inputX, 0, inputZ);
             if (tempVc.magnitude > 1) tempVc = tempVc.normalized;
@@ -115,14 +115,14 @@ public class player : MonoBehaviour
             if (character.transform.position.y != latest_pos.y)
                 targetPositon = new Vector3(latest_pos.x, character.transform.position.y, latest_pos.z);
             Vector3 diff = character.transform.position - targetPositon;
-            if (diff != Vector3.zero && (upbtn.push || leftbtn.push || downbtn.push || rightbtn.push))
+            if (diff != Vector3.zero && (leftbtn.push || rightbtn.push))
             {
                 Quaternion targetRotation = Quaternion.LookRotation(diff);
                 character.transform.rotation = Quaternion.Slerp(character.transform.rotation, targetRotation, Time.deltaTime * kando);
             }
             latest_pos = character.transform.position;  //前回のPositionの更新
 
-            if (!upbtn.push && !leftbtn.push && !downbtn.push && !rightbtn.push)
+            if (!leftbtn.push && !rightbtn.push)
             {
                 //移動してない場合、またはジャンプ中の時はアニメーションや音を止める
                 if (movetrg)

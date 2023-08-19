@@ -10,6 +10,7 @@ public class GManager : MonoBehaviour
     [Header("ゲームオーバーかどうか")] public bool over = false;
     [Header("SoundManagerと連携したグローバルな効果音トリガー。0以上で効果音")] public int setrg = -1;
     [Header("メニューといったUIを開いているかどうか。0以下で開いてない状態")] public int setmenu = 0;
+    [Header("難易度。0=easy,1=normal,2=hard")] public int difficulty_mode = 1;
     //設定できる値
     public float audioMax = 0.16f;
     public float seMax = 0.08f;

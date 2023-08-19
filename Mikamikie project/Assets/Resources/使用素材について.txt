@@ -5,3 +5,10 @@ https://booth.pm/ja/items/2328262
 ■アセット UI関連
 ・Simple Free Pixel art styled UI pack
 https://assetstore.unity.com/packages/2d/gui/icons/simple-free-pixel-art-styled-ui-pack-165012?locale=ja-JP
+・Farland skies
+https://assetstore.unity.com/packages/2d/textures-materials/sky/farland-skies-cloudy-crown-60004
+・UniLang
+https://github.com/adrenak/UniLang
+■サイト フリー素材
+・一部UI icooon mono
+https://icooon-mono.com/
