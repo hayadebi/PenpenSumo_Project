@@ -12,9 +12,11 @@ public class GManager : MonoBehaviour
     [Header("メニューといったUIを開いているかどうか。0以下で開いてない状態")] public int setmenu = 0;
     [Header("難易度。0=easy,1=normal,2=hard")] public int difficulty_mode = 1;
     //設定できる値
+    [Header("オーディオ関係の設定")]
     public float audioMax = 0.16f;
     public float seMax = 0.08f;
-
+    [Header("モーションブラーをかけるかどうか")]
+    public bool motion_trg = false;
     private void Awake()
     {
         if (instance == null)

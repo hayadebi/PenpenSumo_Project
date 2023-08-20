@@ -14,6 +14,8 @@ TagManager:
   - Wall
   - No
   - Character
+  - head
+  - pground
   layers:
   - Default
   - TransparentFX

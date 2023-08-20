@@ -9,6 +9,12 @@ https://assetstore.unity.com/packages/2d/gui/icons/simple-free-pixel-art-styled-
 https://assetstore.unity.com/packages/2d/textures-materials/sky/farland-skies-cloudy-crown-60004
 ・UniLang
 https://github.com/adrenak/UniLang
+・Effekseer
+https://effekseer.github.io/jp/
 ■サイト フリー素材
 ・一部UI icooon mono
 https://icooon-mono.com/
+・効果音ラボ
+https://soundeffect-lab.info/sound/anime/
+・OtoLogic
+https://otologic.jp/free/se/motion-pop01.html
