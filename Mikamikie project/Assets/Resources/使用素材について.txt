@@ -11,6 +11,8 @@ https://assetstore.unity.com/packages/2d/textures-materials/sky/farland-skies-cl
 https://github.com/adrenak/UniLang
 ・Effekseer
 https://effekseer.github.io/jp/
+・SimpleFX
+https://assetstore.unity.com/packages/vfx/particles/simple-fx-cartoon-particles-67834?locale=ja-JP
 ■サイト フリー素材
 ・一部UI icooon mono
 https://icooon-mono.com/

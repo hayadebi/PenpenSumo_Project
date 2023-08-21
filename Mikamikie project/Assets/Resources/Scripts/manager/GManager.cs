@@ -17,6 +17,8 @@ public class GManager : MonoBehaviour
     public float seMax = 0.08f;
     [Header("モーションブラーをかけるかどうか")]
     public bool motion_trg = false;
+    [Header("回避と攻撃を兼用するかどうか")]
+    public bool at_and_dash = false;
     private void Awake()
     {
         if (instance == null)

@@ -214,9 +214,12 @@ MonoBehaviour:
   - de
   - ru
   - ko
-  walktrg: 1
+  walktrg: 0
   over: 0
   setrg: -1
   setmenu: 0
+  difficulty_mode: 1
   audioMax: 0.16
   seMax: 0.08
+  motion_trg: 0
+  at_and_dash: 0
