@@ -218,7 +218,7 @@ MonoBehaviour:
   over: 0
   setrg: -1
   setmenu: 0
-  difficulty_mode: 1
+  difficulty_mode: 0
   audioMax: 0.16
   seMax: 0.08
   motion_trg: 0

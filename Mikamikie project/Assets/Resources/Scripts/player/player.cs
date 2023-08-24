@@ -31,6 +31,7 @@ public class player : MonoBehaviour
 
     [SerializeField] private Animator anim;//プレイヤーのアニメーションセット
     [SerializeField] private Rigidbody rb;//プレイヤーの物理挙動をセット
+    private CapsuleCollider capcol;
     //回転反転に使う値
     private float x_rotation = 0;
     private float y_rotation = 0;
@@ -41,7 +42,10 @@ public class player : MonoBehaviour
     [SerializeField] private int move_num = 1;
     [SerializeField] private int stand_anim = 0;
     [SerializeField] private int walk_anim = 1;
-    [SerializeField] private int jump_anim = 2;
+    [SerializeField] private int jump_anim = 3;
+    [SerializeField] private int dash_anim = 2;
+    [SerializeField] private int at_anim = 4;
+    [SerializeField] private int damage_anim = 4;
     //カメラ関係
     private GameObject cm;
     private Vector3 cm_vec;
@@ -77,6 +81,7 @@ public class player : MonoBehaviour
     public float upspeed_max = 16;
     public ColEvent colevent_ground;
     public ColEvent colevent_head;
+    public ColEvent colevent_ass;
     //回避 攻撃
     private float flipspeed = -170;
     public float fliptime = 0f;
@@ -95,6 +100,7 @@ public class player : MonoBehaviour
         //初手取得
         audioSource = this.GetComponent<AudioSource>();
         rb = this.GetComponent<Rigidbody>();
+        capcol = this.GetComponent<CapsuleCollider>();
         rb.useGravity = false;
         m_xaxiz = body.transform.localEulerAngles;
         latest_pos = character.transform.position;  //前回のPositionの更新
@@ -121,6 +127,8 @@ public class player : MonoBehaviour
         {
             if (!GManager.instance.over)
             {
+                //一部アニメーション
+                if (anim.GetInteger(number_name) == dash_anim && fliptime <= 0 && attime<=0) anim.SetInteger(number_name,stand_anim);
                 //設定に切り替えがあったら
                 if (old_dasgcheck != GManager.instance.at_and_dash)
                 {
@@ -210,18 +218,29 @@ public class player : MonoBehaviour
                 onpost.motiontrg = true;
                 jump_uptrg = true;
             }
+            if ((anim.GetInteger(number_name) == stand_anim || anim.GetInteger(number_name) == walk_anim) && !colevent_ground.coltrg)
+            {
+                anim.SetInteger(number_name, jump_anim); 
+                var tmpscale = character.transform.localScale;
+                if (flipspeed < 0) tmpscale.x = -0.6f;
+                else if (flipspeed > 0) tmpscale.x = 0.6f;
+                character.transform.localScale = tmpscale;
+            }
+            else if (anim.GetInteger(number_name) == jump_anim && colevent_ground.coltrg) anim.SetInteger(number_name, stand_anim);
+            if (anim.GetInteger(number_name) == damage_anim && x_speed==0 && colevent_ground.coltrg) anim.SetInteger(number_name, stand_anim);
             if (jump_cooltime >= 0) jump_cooltime -= Time.deltaTime;
             if (flipcoomtime >= 0) flipcoomtime -= Time.deltaTime;
-            if (attime <= 0 && (Input.GetMouseButton(1) || atbtn.push) && !GManager.instance.at_and_dash && player_stamina >= 2 && x_speed == 0)
+            if (attime <= 0 && ((Input.GetMouseButton(1) && !npc_ai) || atbtn.push) && !GManager.instance.at_and_dash && player_stamina >= 2 && x_speed == 0)
             {
                 attime = 0.5f;
                 player_stamina -= 2;
-                //var tmpdiff = transform.rotation;
-                //tmpdiff.x = -20;
-                //tmpdiff.y = 160;
-                //tmpdiff.z = 0;
-                //var tmppos = transform.position + character.forward * 2f; 
-                //Instantiate(dasheffect, tmppos, tmpdiff, transform);
+                anim.SetInteger(number_name, dash_anim);
+                var tmp = transform.position;
+                tmp.x += flipspeed;
+                Vector3 tmpdiff = transform.position- tmp;
+                Quaternion tmpRotation = Quaternion.LookRotation(tmpdiff);
+                Instantiate(dasheffect, transform.position, tmpRotation, transform);
+                onpost.motiontrg = true;
                 audioSource.PlayOneShot(attackse);
             }
             if ((dashbtn.push || (Input.GetKey(KeyCode.E) && !npc_ai)) && fliptime <= 0 && flipcoomtime <= 0 && player_stamina >= 2 && x_speed == 0)
@@ -231,12 +250,17 @@ public class player : MonoBehaviour
                 flipcoomtime = 1f;
                 player_stamina -= 2;
                 audioSource.PlayOneShot(escapese);
+                anim.SetInteger(number_name, dash_anim);
                 var tmp = transform.position;
                 tmp.x += flipspeed;
-                Vector3 tmpdiff = tmp - character.transform.position;
+                Vector3 tmpdiff = tmp - transform.position;
                 Quaternion tmpRotation = Quaternion.LookRotation(tmpdiff);
                 Instantiate(dasheffect, transform.position, tmpRotation, transform);
                 onpost.motiontrg = true;
+                var tmpscale = character.transform.localScale;
+                if(flipspeed<0)tmpscale.x =0.6f;
+                else if (flipspeed > 0) tmpscale.x = -0.6f;
+                character.transform.localScale = tmpscale;
             }
             if (x_speed != 0)
             {
@@ -245,7 +269,11 @@ public class player : MonoBehaviour
             else if (fliptime >= 0 && x_speed == 0)
             {
                 fliptime -= Time.deltaTime;
-                inputX = flipspeed;
+                inputX = flipspeed*2;
+            }
+            else if (attime >= 0 && x_speed == 0)
+            {
+                inputX = (flipspeed*-1)*2;
             }
             else if (fliptime <= 0 && x_speed == 0)
             {
@@ -306,7 +334,7 @@ public class player : MonoBehaviour
     }
     private void OnTriggerStay(Collider col)
     {
-        if (!GManager.instance.over && GManager.instance.walktrg && col.tag == "player" && col.gameObject!=this.gameObject && attime<=0 && fliptime<=0 && col.gameObject.GetComponent<player>().attime>0&& x_speed==0)
+        if (!GManager.instance.over &&!capcol.isTrigger && GManager.instance.walktrg && col.tag == "player" && col.gameObject!=colevent_ass.gameObject && attime<=0 && fliptime<=0 && col.gameObject.GetComponent<player>().attime>0&& x_speed==0&&colevent_ass.coltrg)
         {
             var tmp = this.transform.position - col.transform.position;
             player tmpplayer = col.gameObject.GetComponent<player>();
@@ -314,12 +342,28 @@ public class player : MonoBehaviour
             if (player_health > 0) x_speed = tmp.x * 1600;
             else { x_speed = tmp.x * 8000; tmpplayer.rb.isKinematic = true;GManager.instance.over = true; }
             audioSource.PlayOneShot(damagese);
+            anim.SetInteger(number_name, damage_anim);
             Instantiate(damageeffect, transform.position, transform.rotation);
+            var tmpscale = character.transform.localScale;
+            if (flipspeed < 0) tmpscale.x = -0.6f;
+            else if (flipspeed > 0) tmpscale.x = 0.6f;
+            character.transform.localScale = tmpscale;
         }
+        else if (!GManager.instance.over && GManager.instance.walktrg && col.tag == "player" && col.gameObject != colevent_ass.gameObject && col.gameObject!=this.gameObject &&( col.gameObject.GetComponent<player>().attime > 0 || col.gameObject.GetComponent<player>().fliptime > 0||fliptime>0) &&x_speed==0 && !colevent_ass.coltrg)
+        {
+            if(rb.constraints!= (RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation)) rb.constraints = RigidbodyConstraints.FreezePositionY|RigidbodyConstraints.FreezePositionZ| RigidbodyConstraints.FreezeRotation;
+            if (!capcol.isTrigger) capcol.isTrigger = true;
+        }
+       
     }
     private void OnTriggerExit(Collider col)
     {
-        ;  
+        if (!GManager.instance.over && GManager.instance.walktrg && col.tag == "player" && col.gameObject != colevent_ass.gameObject && col.gameObject != this.gameObject)
+        {
+            if (capcol.isTrigger) capcol.isTrigger = false;
+            if (rb.constraints == (RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation)) rb.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
+            
+        }
     }
 
 }

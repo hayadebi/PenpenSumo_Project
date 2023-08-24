@@ -22,13 +22,16 @@ public class npc_level : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (width_maxx && npc && width_maxx.transform.position.x <= npc.transform.position.x && return_flip > 0) return_flip *= -1;
-        else if (width_maxx && npc && -width_maxx.transform.position.x >= npc.transform.position.x && return_flip < 0) return_flip *= -1;
+        if (GManager.instance.difficulty_mode == 0)
+        {
+            if (width_maxx && npc && width_maxx.transform.position.x <= npc.transform.position.x && return_flip > 0) return_flip *= -1;
+            else if (width_maxx && npc && -width_maxx.transform.position.x >= npc.transform.position.x && return_flip < 0) return_flip *= -1;
 
-        if (return_flip > 0 && !rightbtn.push) rightbtn.push = true;
-        else if (return_flip < 0 && rightbtn.push) rightbtn.push = false;
+            if (return_flip > 0 && !rightbtn.push) rightbtn.push = true;
+            else if (return_flip < 0 && rightbtn.push) rightbtn.push = false;
 
-        if (return_flip > 0 && leftbtn.push) leftbtn.push = false;
-        else if (return_flip < 0 && !leftbtn.push) leftbtn.push = true;
+            if (return_flip > 0 && leftbtn.push) leftbtn.push = false;
+            else if (return_flip < 0 && !leftbtn.push) leftbtn.push = true;
+        }
     }
 }

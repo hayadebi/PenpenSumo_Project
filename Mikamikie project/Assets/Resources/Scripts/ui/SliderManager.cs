@@ -21,7 +21,7 @@ public class SliderManager : MonoBehaviour
         if (_player&&_slider)
         {
             if(_event == 0) _slider.value = _player.player_health;
-            if (_event == 0) _slider.value = _player.player_stamina;
+            if (_event == 1) _slider.value = _player.player_stamina;
         }
     }
     private void Update()
