@@ -47,9 +47,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   se:
   - {fileID: 8300000, guid: c1f68abfebcf2aa468ce96fe8ba6b708, type: 3}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 8300000, guid: 2f3896c1936e6f146b904dc9a5d81a1a, type: 3}
+  - {fileID: 8300000, guid: 5636962489f38ff4aade1ac70a4cb496, type: 3}
+  - {fileID: 8300000, guid: 986758dd4916df5408f7d34dc0dabd2e, type: 3}
   targetremove_scene: null
 --- !u!82 &8318713574705252609
 AudioSource:

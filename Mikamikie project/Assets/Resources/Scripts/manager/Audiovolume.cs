@@ -14,7 +14,7 @@ public class Audiovolume : MonoBehaviour
     {
         //アタッチされているAudioSource取得
         _audio = GetComponent<AudioSource>();
-        if (GManager.instance.over)
+        if (GManager.instance.over!=-1)
         {
             _audio.volume = GManager.instance.audioMax / 12;
             oldvolume = GManager.instance.audioMax / 12;
@@ -59,14 +59,14 @@ public class Audiovolume : MonoBehaviour
             _audio.enabled = true;
             isadd = false;
         }
-        if ((GManager.instance.over ||!GManager.instance.walktrg )&&over_zero && !setrg )
+        if ((GManager.instance.over!=-1 ||!GManager.instance.walktrg )&&over_zero && !setrg )
         {
-            if (oldvolume != GManager.instance.audioMax / 16 && !setrg && !GManager.instance.over)
+            if (oldvolume != GManager.instance.audioMax / 16 && !setrg && GManager.instance.over==-1)
             {
                 _audio.volume = GManager.instance.audioMax / 12;
                 oldvolume = GManager.instance.audioMax / 12;
             }
-            else if (oldvolume != 0 && !setrg && GManager.instance.over)
+            else if (oldvolume != 0 && !setrg && GManager.instance.over!=-1)
             {
                 _audio.volume = 0;
                 oldvolume = 0;

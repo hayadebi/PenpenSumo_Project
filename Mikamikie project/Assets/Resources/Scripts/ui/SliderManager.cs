@@ -26,15 +26,15 @@ public class SliderManager : MonoBehaviour
     }
     private void Update()
     {
-        if (_event == 0&& _player && _slider&&(int)_slider.value != _player.player_health)
-        {
-            _slider.value = _player.player_health;
-            iTween.ShakePosition(_slider.gameObject, iTween.Hash("x",3f,"y", 3f,"time", 0.5f));
-        }
-        else if (_event == 1 && _player && _slider && (int)_slider.value != _player.player_stamina)
-        {
-            _slider.value = _player.player_stamina;
-            iTween.ShakePosition(_slider.gameObject, iTween.Hash("x", 2.5f, "y", 2.5f, "time", 0.4f));
-        }
+            if (_event == 0 && _player && _slider && (int)_slider.value != _player.player_health)
+            {
+                _slider.value = _player.player_health;
+                iTween.ShakePosition(_slider.gameObject, iTween.Hash("x", 3f, "y", 3f, "time", 0.5f));
+            }
+            else if (_event == 1 && _player && _slider && (int)_slider.value != _player.player_stamina)
+            {
+                _slider.value = _player.player_stamina;
+                iTween.ShakePosition(_slider.gameObject, iTween.Hash("x", 2.5f, "y", 2.5f, "time", 0.4f));
+            }
     }
 }

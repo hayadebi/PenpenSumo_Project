@@ -14,9 +14,13 @@ public class clickbutton : MonoBehaviour
     public int mode_num = 1;
     public Text mode_text;
     private string[] modes = new string[3];
+    [Header("最初のカウント")]
     private float cooltime = 0f;
+    private int countnum=3;
+    [SerializeField] private Text counttext;
 
     private bool clicktrg = false;
+    [SerializeField] private bool resetwalk = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +31,7 @@ public class clickbutton : MonoBehaviour
             modes[2] = "HARD";
             mode_text.text = "難易度：" + modes[GManager.instance.difficulty_mode] + "で開始(仮)";
         }
+        if (resetwalk) GManager.instance.walktrg = false;
     }
     private void Update()
     {
@@ -44,7 +49,7 @@ public class clickbutton : MonoBehaviour
     }
     void SceneChange()
     {
-        GManager.instance.over = false;
+        GManager.instance.over = -1;
         GManager.instance.walktrg = true;
         GManager.instance.setmenu = 0;
         Resources.UnloadUnusedAssets();
@@ -65,5 +70,17 @@ public class clickbutton : MonoBehaviour
     public void quitClick()
     {
         Application.Quit();
+    }
+    public void OnWalk()
+    {
+        counttext.text = "尻相撲開始！";
+        GManager.instance.walktrg = true;
+        GManager.instance.setrg = 3;
+    }
+    public void OnCount()
+    {
+        GManager.instance.setrg = 2;
+        counttext.text = countnum.ToString();
+        countnum -= 1;
     }
 }

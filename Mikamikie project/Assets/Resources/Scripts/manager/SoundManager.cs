@@ -12,8 +12,7 @@ public class SoundManager : MonoBehaviour
     {
         audioS = GetComponent<AudioSource>();
         GManager.instance.setmenu = 0;
-        GManager.instance.over = false;
-        GManager.instance.walktrg = true;
+        GManager.instance.over = -1;
     }
 
     private void FixedUpdate()

@@ -1678,6 +1678,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4157243107652842978, guid: 5e12b32ad4d714c469cbd34f352354a5,
         type: 3}
+      propertyPath: walktrg
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4157243107652842978, guid: 5e12b32ad4d714c469cbd34f352354a5,
+        type: 3}
       propertyPath: difficulty_mode
       value: 0
       objectReference: {fileID: 0}
