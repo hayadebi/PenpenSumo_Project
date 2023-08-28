@@ -36,7 +36,6 @@ public class player : MonoBehaviour
     private float x_rotation = 0;
     private float y_rotation = 0;
     private Vector3 m_xaxiz;
-    private Vector3 cm_axiz;
 
     //各アニメーションに該当する値
     [SerializeField] private int move_num = 1;
@@ -46,12 +45,7 @@ public class player : MonoBehaviour
     [SerializeField] private int dash_anim = 2;
     [SerializeField] private int at_anim = 4;
     [SerializeField] private int damage_anim = 4;
-    //カメラ関係
-    private GameObject cm;
-    private Vector3 cm_vec;
-    [SerializeField] private float cmlimit_width = 140;
-    [SerializeField] private float cmlimit_up = 83;
-    [SerializeField] private float cmlimit_down = -22;
+
     //操作ボタンに関する
     private longbuttonclick rightbtn;
     private longbuttonclick leftbtn;
@@ -88,9 +82,10 @@ public class player : MonoBehaviour
     private float flipcoomtime = 0f;
     private onPostSc onpost;
     public float attime = 0f;
-    [SerializeField] private GameObject dasheffect;
+    [SerializeField] private GameObject dasheffect;//ダッシュエフェクト
     [SerializeField] private GameObject damageeffect;//ダメージエフェクト
-    [SerializeField] private GameObject popuiobj;
+    [SerializeField] private GameObject jumpeffect;
+    public GameObject popuiobj;
     //スタミナ回復
     private float stamina_time = 0f;
     private bool oneover = false;
@@ -107,9 +102,6 @@ public class player : MonoBehaviour
         rb.useGravity = false;
         m_xaxiz = body.transform.localEulerAngles;
         latest_pos = character.transform.position;  //前回のPositionの更新
-
-        cm = GameObject.Find("Main Camera");
-        cm_vec = cm.transform.position - this.transform.position;
 
         rightbtn = GameObject.Find(rightbtn_name).GetComponent<longbuttonclick>();
         leftbtn = GameObject.Find(leftbtn_name).GetComponent<longbuttonclick>();
@@ -128,7 +120,7 @@ public class player : MonoBehaviour
     {
         if (GManager.instance.walktrg && !stoptrg && (rightbtn && leftbtn))
         {
-            if (GManager.instance.over==-1)
+            if (GManager.instance.over == -1)
             {
                 if (nextframe_dash)
                 {
@@ -136,7 +128,8 @@ public class player : MonoBehaviour
                     anim.SetInteger(number_name, dash_anim);
                 }
                 //一部アニメーション
-                if (anim.GetInteger(number_name) == dash_anim&& fliptime <= 0 && attime<=0) anim.SetInteger(number_name,stand_anim);
+                if (anim.GetInteger(number_name) == dash_anim && fliptime <= 0) {anim.SetInteger(number_name, stand_anim); movetrg = false;}
+            else if (anim.GetInteger(number_name) == at_anim && attime <= 0) { anim.SetInteger(number_name, stand_anim); movetrg = false; }
                 //設定に切り替えがあったら
                 if (old_dasgcheck != GManager.instance.at_and_dash)
                 {
@@ -154,22 +147,13 @@ public class player : MonoBehaviour
                         player_stamina += 1;
                     }
                 }
-                //カメラ部分
-                if (cm.transform.position != this.transform.position + cm_vec && (cm.transform.position- (this.transform.position + cm_vec)).magnitude>0.1f)
-                {
-                    var tmp = this.transform.position;
-                    if (tmp.x > cmlimit_width) tmp.x = cmlimit_width;
-                    else if (tmp.x < -cmlimit_width) tmp.x = -cmlimit_width;
-                    if (tmp.y > cmlimit_up) tmp.y = cmlimit_up;
-                    if (tmp.y < cmlimit_down) tmp.y = cmlimit_down;
-                    if (!npc_ai) cm.transform.position = Vector3.Slerp(cm.transform.position, tmp + cm_vec, Time.deltaTime * 2);
-                }
+
                 x_speed = Mathf.Lerp(x_speed, 0, Time.deltaTime * player_knockbackresistance);
             }
             else if ((!GManager.instance.walktrg || GManager.instance.over!=-1) && anim.GetInteger(number_name) != stand_anim)
             {
                 if (fliptime <= 0 && jump_cooltime <= 0 && attime <= 0) audioSource.Stop();
-                anim.SetInteger(number_name, stand_anim);
+               anim.SetInteger(number_name, stand_anim);
                 y_speed = 0;
                 rb.velocity = Vector3.zero;
                 rb.isKinematic = true;
@@ -181,20 +165,24 @@ public class player : MonoBehaviour
             x_rotation = 0;
             y_rotation = 0;
 
-            if (!jump_uptrg && !jump_slowtrg) y_speed = -gravity;
-            else if (!jump_uptrg && jump_slowtrg) y_speed = -(gravity / slow_max);
-            else if (jump_uptrg && !jump_slowtrg)
+            if (GManager.instance.over==-1)
             {
-                y_speed = upspeed_max;
-                if (x_speed != 0) y_speed /= 2f;
-                jump_uptime += Time.deltaTime;
-                if (jump_uptime >= jump_maxuptime)
+                if (!jump_uptrg && !jump_slowtrg) y_speed = -gravity;
+                else if (!jump_uptrg && jump_slowtrg) y_speed = -(gravity / slow_max);
+                else if (jump_uptrg && !jump_slowtrg)
                 {
-                    jump_uptime = 0f;
-                    jump_uptrg = false;
-                    jump_slowtrg = true;
+                    y_speed = upspeed_max;
+                    if (x_speed != 0) y_speed /= 2f;
+                    jump_uptime += Time.deltaTime;
+                    if (jump_uptime >= jump_maxuptime)
+                    {
+                        jump_uptime = 0f;
+                        jump_uptrg = false;
+                        jump_slowtrg = true;
+                    }
                 }
-            };
+            }
+            
             if (colevent_ground.coltrg && jump_slowtrg) { jump_slowtrg = false; onpost.motiontrg = false; }
             if (colevent_ground.coltrg && Math.Abs(x_speed) <= 0.5f) { x_speed = 0; }
             //if (!colevent_ground.coltrg && jump_uptrg && jump_uptime >= (jump_maxuptime / 3) && (!jumpbtn.push && !Input.GetKey(KeyCode.W) && x_speed <= 0))
@@ -214,10 +202,16 @@ public class player : MonoBehaviour
             //移動メイン部分
             float inputX = 0;
             float inputZ = 0;
-
-            if (((jumpbtn.push && anim.GetInteger(number_name) != dash_anim) || (Input.GetKey(KeyCode.W) && !npc_ai) || x_speed != 0) && colevent_ground.coltrg && player_stamina >= 1 && jump_cooltime <= 0 && fliptime <= 0)
+            //ジャンプ
+            if ((jumpbtn.push || (Input.GetKey(KeyCode.W) && !npc_ai) || x_speed != 0) && colevent_ground.coltrg && player_stamina >= 1 && jump_cooltime <= 0 && fliptime <= 0 && anim.GetInteger(number_name) != dash_anim)
             {
                 jump_cooltime = 0.3f;
+                var tmpscale = character.transform.localScale;
+                if (flipspeed < 0) tmpscale.x = -0.6f;
+                else if (flipspeed > 0) tmpscale.x = 0.6f;
+                character.transform.localScale = tmpscale;
+                anim.SetInteger(number_name, jump_anim);
+                Instantiate(jumpeffect, transform.position, transform.rotation);
                 if (x_speed == 0)
                 {
                     player_stamina -= 1;
@@ -226,33 +220,8 @@ public class player : MonoBehaviour
                 onpost.motiontrg = true;
                 jump_uptrg = true;
             }
-            if ((anim.GetInteger(number_name) == stand_anim || anim.GetInteger(number_name) == walk_anim) && !colevent_ground.coltrg)
-            {
-                anim.SetInteger(number_name, jump_anim); 
-                var tmpscale = character.transform.localScale;
-                if (flipspeed < 0) tmpscale.x = -0.6f;
-                else if (flipspeed > 0) tmpscale.x = 0.6f;
-                character.transform.localScale = tmpscale;
-            }
-            else if (anim.GetInteger(number_name) == jump_anim && colevent_ground.coltrg) anim.SetInteger(number_name, stand_anim);
-            if (anim.GetInteger(number_name) == damage_anim && x_speed==0 && colevent_ground.coltrg) anim.SetInteger(number_name, stand_anim);
-            if (jump_cooltime >= 0) jump_cooltime -= Time.deltaTime;
-            if (flipcoomtime >= 0) flipcoomtime -= Time.deltaTime;
-            if (attime <= 0 && ((Input.GetMouseButton(1) && !npc_ai) || (atbtn.push&&!jump_uptrg && !jump_slowtrg)) && !GManager.instance.at_and_dash && player_stamina >= 2 && x_speed == 0)
-            {
-                attime = 0.4f;
-                player_stamina -= 2;
-                anim.SetInteger(number_name, stand_anim);
-                nextframe_dash = true;
-                var tmp = transform.position;
-                tmp.x += flipspeed;
-                Vector3 tmpdiff = transform.position- tmp;
-                Quaternion tmpRotation = Quaternion.LookRotation(tmpdiff);
-                Instantiate(dasheffect, transform.position, tmpRotation, transform);
-                onpost.motiontrg = true;
-                audioSource.PlayOneShot(attackse);
-            }
-            if (((dashbtn.push&&attime<=0&& !jump_uptrg && !jump_slowtrg) || (Input.GetKey(KeyCode.E) && !npc_ai)) && fliptime <= 0 && flipcoomtime <= 0 && player_stamina >= 2 && x_speed == 0)
+            //ダッシュ
+            else if (((dashbtn.push) || (Input.GetKey(KeyCode.E) && !npc_ai)) && fliptime <= 0 && flipcoomtime <= 0 && player_stamina >= 2 && x_speed == 0 && attime <= 0 && !jump_uptrg && !jump_slowtrg)
             {
                 fliptime = 0.3f;
                 if (GManager.instance.at_and_dash) attime = 0.45f;
@@ -268,10 +237,38 @@ public class player : MonoBehaviour
                 Instantiate(dasheffect, transform.position, tmpRotation, transform);
                 onpost.motiontrg = true;
                 var tmpscale = character.transform.localScale;
-                if(flipspeed<0)tmpscale.x =0.6f;
+                if (flipspeed < 0) tmpscale.x = 0.6f;
                 else if (flipspeed > 0) tmpscale.x = -0.6f;
                 character.transform.localScale = tmpscale;
             }
+            //攻撃
+            else if (attime <= 0 && ((Input.GetMouseButton(1) && !npc_ai) || (atbtn.push)) && !GManager.instance.at_and_dash && player_stamina >= 2 && x_speed == 0 && !jump_uptrg && !jump_slowtrg)
+            {
+                attime = 0.5f;
+                player_stamina -= 2;
+                var tmpscale = character.transform.localScale;
+                if (flipspeed < 0) tmpscale.x = -0.6f;
+                else if (flipspeed > 0) tmpscale.x = 0.6f;
+                character.transform.localScale = tmpscale;
+                anim.SetInteger(number_name, at_anim);
+                onpost.motiontrg = true;
+                audioSource.PlayOneShot(attackse);
+            }
+
+
+            if ((anim.GetInteger(number_name) == stand_anim || anim.GetInteger(number_name) == walk_anim) && !colevent_ground.coltrg)
+            {
+                anim.SetInteger(number_name, jump_anim); 
+                var tmpscale = character.transform.localScale;
+                if (flipspeed < 0) tmpscale.x = -0.6f;
+                else if (flipspeed > 0) tmpscale.x = 0.6f;
+                character.transform.localScale = tmpscale;
+            }
+            else if (anim.GetInteger(number_name) == jump_anim && colevent_ground.coltrg) anim.SetInteger(number_name, stand_anim);
+            if (anim.GetInteger(number_name) == damage_anim && x_speed==0 && colevent_ground.coltrg) anim.SetInteger(number_name, stand_anim);
+            if (jump_cooltime >= 0) jump_cooltime -= Time.deltaTime;
+            if (flipcoomtime >= 0) flipcoomtime -= Time.deltaTime;
+            
             if (x_speed != 0)
             {
                 inputX = x_speed;
@@ -281,19 +278,15 @@ public class player : MonoBehaviour
                 fliptime -= Time.deltaTime;
                 inputX = flipspeed*2;
             }
-            else if (attime >= 0 && x_speed == 0)
-            {
-                inputX = (flipspeed*-1)/6f;
-            }
             else if (fliptime <= 0 && x_speed == 0)
             {
                 if (!jump_uptrg && onpost.motiontrg) onpost.motiontrg = false;
-                if (attime<=0&&fliptime<=0&&(rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai)) && (jump_uptrg || jump_slowtrg)) { inputX = 0.7f; flipspeed = -(0.7f * 80); }
-                else if (attime <= 0 && fliptime <= 0 && (rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai))) { inputX = 1; flipspeed = -80; }
-                if (attime <= 0 && fliptime <= 0 && (leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai)) && (jump_uptrg || jump_slowtrg)) { inputX = -0.7f; flipspeed = 0.7f * 80; }
-                else if (attime <= 0 && fliptime <= 0 && (leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai))) { inputX = -1; flipspeed = 80; }
+                if (fliptime<=0&&(rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai)) && (jump_uptrg || jump_slowtrg)) { inputX = 0.7f; flipspeed = -(0.7f * 80); }
+                else if ( fliptime <= 0 && (rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai))) { inputX = 1; flipspeed = -80; }
+                if ( fliptime <= 0 && (leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai)) && (jump_uptrg || jump_slowtrg)) { inputX = -0.7f; flipspeed = 0.7f * 80; }
+                else if ( fliptime <= 0 && (leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai))) { inputX = -1; flipspeed = 80; }
 
-                if (attime > 0 && !GManager.instance.at_and_dash) inputX /= 6;
+                if (attime > 0 && !GManager.instance.at_and_dash) inputX /= 2;
             }
             if (attime >= 0)
             {
@@ -316,17 +309,22 @@ public class player : MonoBehaviour
             }
             latest_pos = character.transform.position;  //前回のPositionの更新
 
-            if (movetrg && !(leftbtn.push || Input.GetKey(KeyCode.A)) && !(rightbtn.push || Input.GetKey(KeyCode.D))&&attime<=0&&fliptime<=0)
+            if (movetrg && !(leftbtn.push || Input.GetKey(KeyCode.A)) && !(rightbtn.push || Input.GetKey(KeyCode.D))&&fliptime<=0&&colevent_ground.coltrg)
             {
                 movetrg = false;
-                anim.SetInteger(number_name, stand_anim);
+                var tmpscale = character.transform.localScale;
+                if (flipspeed < 0) tmpscale.x = -0.6f;
+                else if (flipspeed > 0) tmpscale.x = 0.6f;
+                character.transform.localScale = tmpscale;
+                if (attime<=0) anim.SetInteger(number_name, stand_anim);
                 audioSource.loop = false;
                 if (jump_cooltime <= 0 ) audioSource.Stop();
             }
-            else if (movetrg && (jump_uptrg || jump_slowtrg || !colevent_ground.coltrg||attime>0||fliptime>0))
+            else if (movetrg&& (jump_uptrg || jump_slowtrg || !colevent_ground.coltrg||fliptime>0)||attime>0)
             {
                 movetrg = false;
-                anim.SetInteger(number_name, stand_anim);
+
+                if(attime<=0)anim.SetInteger(number_name, stand_anim);
                 audioSource.loop = false;
                 if (fliptime <= 0 && jump_cooltime <= 0 && attime <= 0) audioSource.Stop();
             }
@@ -335,8 +333,10 @@ public class player : MonoBehaviour
         {
             if (((this.gameObject.name == "Player (1)" && GManager.instance.over == 2) || (this.gameObject.name == "Player" && GManager.instance.over == 1))&& anim.GetInteger("Anumber")!=12) anim.SetInteger("Anumber", 12);
             if (rb.velocity != Vector3.zero) rb.velocity = Vector3.zero;
+            
         }
         else if(GManager.instance.over!=-1 && audioSource.isPlaying) audioSource.Stop();
+        if (this.gameObject.name == "Player (1)" && GManager.instance.over == 2 && anim.GetInteger(number_name) != jump_anim) { anim.SetInteger(number_name, jump_anim); audioSource.Stop(); jump_uptrg = true; }
     }
     private void OnTriggerStay(Collider col)
     {
@@ -345,6 +345,13 @@ public class player : MonoBehaviour
             var tmp = this.transform.position - col.transform.position;
             player tmpplayer = col.gameObject.GetComponent<player>();
             player_health -= tmpplayer.player_at;
+
+            var tmp2 = tmpplayer.gameObject.transform.position;
+            tmp2.x += tmpplayer.flipspeed;
+            Vector3 tmpdiff = tmpplayer.gameObject.transform.position- tmp2;
+            Quaternion tmpRotation = Quaternion.LookRotation(tmpdiff);
+            Instantiate(damageeffect, this.transform.position, tmpRotation, this.transform);
+
             if (player_health > 0) x_speed = tmp.x * 1600;
             else { x_speed = tmp.x * 8000;
                 if (this.gameObject.name == "Player") GManager.instance.over = 1;

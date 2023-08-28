@@ -16,6 +16,7 @@ TagManager:
   - Character
   - head
   - pground
+  - ass
   layers:
   - Default
   - TransparentFX
