@@ -17,6 +17,8 @@ https://assetstore.unity.com/packages/vfx/particles/simple-fx-cartoon-particles-
 https://assetstore.unity.com/packages/2d/environments/pixel-art-platformer-village-props-166114?locale=ja-JP
 ・Anime Particles Pack
 https://assetstore.unity.com/packages/vfx/particles/anime-particles-pack-125134
+・Vlight
+https://assetstore.unity.com/packages/tools/particles-effects/v-light-volumetric-lights-2037?locale=ja-JP
 ■サイト フリー素材
 ・一部UI icooon mono
 https://icooon-mono.com/

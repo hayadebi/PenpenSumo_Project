@@ -19,6 +19,8 @@ public class GManager : MonoBehaviour
     public bool motion_trg = false;
     [Header("回避と攻撃を兼用するかどうか")]
     public bool at_and_dash = false;
+    [Header("タイトルのアニメーションが有効かどうか")]
+    public bool title_anim = true;
     private void Awake()
     {
         if (instance == null)
