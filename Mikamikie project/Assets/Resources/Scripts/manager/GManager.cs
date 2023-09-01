@@ -15,10 +15,10 @@ public class GManager : MonoBehaviour
     [Header("オーディオ関係の設定")]
     public float audioMax = 0.16f;
     public float seMax = 0.08f;
-    [Header("モーションブラーをかけるかどうか")]
-    public bool motion_trg = false;
-    [Header("回避と攻撃を兼用するかどうか")]
-    public bool at_and_dash = false;
+    //[Header("モーションブラーをかけるかどうか")]
+    //public bool motion_trg = false;
+   // [Header("回避と攻撃を兼用するかどうか")]
+    //public bool at_and_dash = false;
     [Header("タイトルのアニメーションが有効かどうか")]
     public bool title_anim = true;
     private void Awake()
