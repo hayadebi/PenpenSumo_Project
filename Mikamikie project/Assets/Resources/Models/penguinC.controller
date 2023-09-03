@@ -626,7 +626,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: penguin_newrun
-  m_Speed: 0.65
+  m_Speed: 0.9
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 1993948269247942037}
@@ -692,7 +692,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.15
+  m_TransitionDuration: 0.1
   m_TransitionOffset: 0
   m_ExitTime: 0.75409836
   m_HasExitTime: 0
@@ -843,10 +843,10 @@ AnimatorState:
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
-  - {fileID: 7698009687451167008}
-  - {fileID: 5142632336665191194}
-  - {fileID: -5913410626911271830}
   - {fileID: -2638068436673084203}
+  - {fileID: 5142632336665191194}
+  - {fileID: 7698009687451167008}
+  - {fileID: -5913410626911271830}
   - {fileID: -2289272978256052641}
   - {fileID: 3331136270223989937}
   m_StateMachineBehaviours: []
@@ -881,7 +881,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.1
+  m_TransitionDuration: 0.05
   m_TransitionOffset: 0
   m_ExitTime: 0.75409836
   m_HasExitTime: 0
@@ -1048,9 +1048,9 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 2874296454786589665}
+  - {fileID: 1590205103599620764}
   - {fileID: 6353810682913724670}
   - {fileID: -8782498713458983511}
-  - {fileID: 1590205103599620764}
   - {fileID: -2287515612827809175}
   - {fileID: -2409808550410073726}
   m_StateMachineBehaviours: []
@@ -1179,7 +1179,7 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: 6097173424276973248}
-    m_Position: {x: 810, y: 340, z: 0}
+    m_Position: {x: 470, y: 370, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -6033700495663463990}
     m_Position: {x: 510, y: 650, z: 0}

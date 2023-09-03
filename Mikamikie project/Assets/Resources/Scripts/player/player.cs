@@ -14,7 +14,7 @@ public class player : MonoBehaviour
     public int player_knockbackresistance = 40;
     [SerializeField]private float player_speed = 2;//プレイヤーの速度
     [SerializeField] private float gravity = 32;//重力値
-    [SerializeField] private Transform character;//プレイヤー本体、メインに対応するトランスフォーム
+    public Transform character;//プレイヤー本体、メインに対応するトランスフォーム
     [SerializeField] private Transform body;//プレイヤーのモデルに対応するトランスフォーム
     private bool movetrg = false;//移動時にアニメーションさせるかどうか
     [SerializeField] private string number_name;//アニメーターの変数名
@@ -173,11 +173,12 @@ public class player : MonoBehaviour
                 rb.useGravity = false;
             x_rotation = 0;
             y_rotation = 0;
-
-            if (!jump_uptrg && !jump_slowtrg) y_speed = -gravity;
-            else if (!jump_uptrg && jump_slowtrg) y_speed = -(gravity / slow_max);
-            if ((jump_uptrg && !jump_slowtrg))
+            bool tmpzerotrg = true;
+            if (!jump_uptrg && !jump_slowtrg && flipcoomtime<=0 && attime <= 0) { y_speed = -gravity; tmpzerotrg = false; }
+            else if (!jump_uptrg && jump_slowtrg && flipcoomtime <= 0 && attime <= 0){ y_speed = -(gravity / slow_max); ; tmpzerotrg = false; }
+            if (jump_uptrg && !jump_slowtrg && flipcoomtime <= 0 && attime <= 0)
             {
+                tmpzerotrg = false;
                 y_speed = upspeed_max;
                 if (x_speed != 0) y_speed /= 2f;
                 jump_uptime += Time.deltaTime;
@@ -188,18 +189,17 @@ public class player : MonoBehaviour
                     jump_slowtrg = true;
                 }
             }
-
+            if (tmpzerotrg) y_speed = upspeed_max/12;
             if (colevent_ground.coltrg && jump_slowtrg) { jump_slowtrg = false; onpost.motiontrg = false; }
             if (colevent_ground.coltrg && Math.Abs(x_speed) <= 0.5f) { x_speed = 0; }
-            //if (!colevent_ground.coltrg && jump_uptrg && jump_uptime >= (jump_maxuptime / 3) && (!jumpbtn.push && !Input.GetKey(KeyCode.W) && x_speed <= 0))
-            //{
-            //    jump_uptrg = false;
-            //    jump_slowtrg = true;
-            //}
             if (!movetrg && attime <= 0 && fliptime <= 0 && !jump_slowtrg && !jump_uptrg && ((rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai)) || (leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai))))
             {
                 //この部分では歩きの効果音、アニメーションを操作
                 movetrg = true;
+                var tmpscale = character.transform.localScale;
+                if (flipspeed < 0) tmpscale.x = 0.6f;
+                else if (flipspeed > 0) tmpscale.x = -0.6f;
+                character.transform.localScale = tmpscale;
                 audioSource.clip = groundse;
                 audioSource.loop = true;
                 audioSource.Play();
@@ -208,57 +208,6 @@ public class player : MonoBehaviour
             //移動メイン部分
             float inputX = 0;
             float inputZ = 0;
-            ////ジャンプ (jumpbtn.push || (Input.GetKey(KeyCode.W) && !npc_ai) || x_speed != 0)
-            //if ((jumpbtn.push || (Input.GetKey(KeyCode.W) && !npc_ai)) && colevent_ground.coltrg && player_stamina >= 1 && jump_cooltime <= 0 && fliptime <= 0 && anim.GetInteger(number_name) != dash_anim && anim.GetInteger(number_name) != at_anim)
-            //{
-            //    jump_cooltime = 0.3f;
-            //    var tmpscale = character.transform.localScale;
-            //    if (flipspeed < 0) tmpscale.x = -0.6f;
-            //    else if (flipspeed > 0) tmpscale.x = 0.6f;
-            //    character.transform.localScale = tmpscale;
-            //    anim.SetInteger(number_name, jump_anim);
-            //    Instantiate(jumpeffect, transform.position, transform.rotation);
-            //    if (x_speed == 0)
-            //    {
-            //        player_stamina -= 1;
-            //        audioSource.PlayOneShot(jumpse);
-            //    }
-            //    onpost.motiontrg = true;
-            //    jump_uptrg = true;
-            //}
-            ////ダッシュ
-            //else if ((dashbtn.push || (Input.GetKey(KeyCode.E) && !npc_ai)) && fliptime <= 0 && flipcoomtime <= 0 && player_stamina >= 2 && x_speed == 0 && attime <= 0)
-            //{
-            //    fliptime = 0.3f;
-            //    flipcoomtime = 1f;
-            //    player_stamina -= 2;
-            //    anim.SetInteger(number_name, stand_anim);
-            //    audioSource.PlayOneShot(escapese);
-            //    nextframe_dash = true;
-            //    var tmp = transform.position;
-            //    tmp.x += flipspeed;
-            //    Vector3 tmpdiff = tmp - transform.position;
-            //    Quaternion tmpRotation = Quaternion.LookRotation(tmpdiff);
-            //    Instantiate(dasheffect, transform.position, tmpRotation, transform);
-            //    onpost.motiontrg = true;
-            //    var tmpscale = character.transform.localScale;
-            //    if (flipspeed < 0) tmpscale.x = 0.6f;
-            //    else if (flipspeed > 0) tmpscale.x = -0.6f;
-            //    character.transform.localScale = tmpscale;
-            //}
-            ////攻撃
-            //else if (attime <= 0 && ((Input.GetMouseButton(1) && !npc_ai) || atbtn.push)  && player_stamina >= 2 && x_speed == 0)
-            //{
-            //    attime = 0.5f;
-            //    player_stamina -= 2;
-            //    var tmpscale = character.transform.localScale;
-            //    if (flipspeed < 0) tmpscale.x = -0.6f;
-            //    else if (flipspeed > 0) tmpscale.x = 0.6f;
-            //    character.transform.localScale = tmpscale;
-            //    anim.SetInteger(number_name, at_anim);
-            //    onpost.motiontrg = true;
-            //    audioSource.PlayOneShot(attackse);
-            //}
             //ジャンプ (jumpbtn.push || (Input.GetKey(KeyCode.W) && !npc_ai) || x_speed != 0)
             if ((Input.GetKey(KeyCode.W) && !npc_ai) && colevent_ground.coltrg && player_stamina >= 1 && jump_cooltime <= 0 && fliptime <= 0 && anim.GetInteger(number_name) != dash_anim && anim.GetInteger(number_name) != at_anim)
             {
@@ -355,13 +304,13 @@ public class player : MonoBehaviour
 
         }
         else if (GManager.instance.over != -1 && audioSource.isPlaying) audioSource.Stop();
-        if (this.gameObject.name == "Player (1)" && GManager.instance.over == 2 && anim.GetInteger(number_name) != jump_anim) { anim.SetInteger(number_name, jump_anim); audioSource.Stop(); jump_uptrg = true; }
+        //if (this.gameObject.name == "Player" && GManager.instance.over == 1 && anim.GetInteger(number_name) != jump_anim) { anim.SetInteger(number_name, jump_anim); audioSource.Stop(); jump_uptrg = true; }
     }
     public void PlayerAttack()
     {
-        if (attime <= 0 && player_stamina >= 2 && x_speed == 0)
+        if (attime <= 0 && player_stamina >= 2 && x_speed == 0 && GManager.instance.walktrg && GManager.instance.over==-1)
         {
-            attime = 0.65f;
+            attime = 0.45f;
             player_stamina -= 2;
             var tmpscale = character.transform.localScale;
             if (flipspeed < 0) tmpscale.x = -0.6f;
@@ -374,7 +323,7 @@ public class player : MonoBehaviour
     }
     public void PlayerJump()
     {
-        if ( colevent_ground.coltrg && player_stamina >= 1 && jump_cooltime <= 0 && fliptime <= 0 && anim.GetInteger(number_name) != dash_anim && anim.GetInteger(number_name) != at_anim)
+        if ( colevent_ground.coltrg && player_stamina >= 1 && jump_cooltime <= 0 && fliptime <= 0 && anim.GetInteger(number_name) != dash_anim && anim.GetInteger(number_name) != at_anim && GManager.instance.walktrg && GManager.instance.over == -1)
         {
             jump_cooltime = 0.3f;
             var tmpscale = character.transform.localScale;
@@ -394,10 +343,10 @@ public class player : MonoBehaviour
     }
     public void PlayerDash()
     {
-        if (fliptime <= 0 && flipcoomtime <= 0 && player_stamina >= 2 && x_speed == 0 && attime <= 0 )
+        if (fliptime <= 0 && flipcoomtime <= 0 && player_stamina >= 2 && x_speed == 0 && attime <= 0 && GManager.instance.walktrg && GManager.instance.over == -1)
         {
             fliptime = 0.3f;
-            flipcoomtime = 1f;
+            flipcoomtime = 0.45f;
             player_stamina -= 2;
             anim.SetInteger(number_name, dash_anim);
             audioSource.PlayOneShot(escapese);

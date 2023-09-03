@@ -1922,7 +1922,7 @@ Camera:
   far clip plane: 2000
   field of view: 90
   orthographic: 1
-  orthographic size: 105
+  orthographic size: 115
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
@@ -3515,16 +3515,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 311147827}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8729702cb51cf7b4d8a29646205d033d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rightbtn: {fileID: 287528313}
   leftbtn: {fileID: 302132616}
-  jumpbtn: {fileID: 0}
-  atbtn: {fileID: 0}
-  dashbtn: {fileID: 0}
+  return_flip: 1
+  cooltime: 0
   colev: {fileID: 535668040}
   pl: {fileID: 535668033}
 --- !u!1 &313418980
@@ -5779,7 +5778,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 535668031}
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 110.00009, y: -21.8, z: -2}
+  m_LocalPosition: {x: 110.0001, y: -21.8, z: -2}
   m_LocalScale: {x: 18, y: 18, z: 18}
   m_Children:
   - {fileID: 1575786304}
@@ -5833,8 +5832,6 @@ MonoBehaviour:
   upspeed_max: 210
   colevent_ground: {fileID: 889560265}
   colevent_head: {fileID: 1984634053}
-  colevent_ass: {fileID: 489223853}
-  colevent_forward: {fileID: 451771305}
   flipspeed: -170
   fliptime: 0
   attime: 0
@@ -9909,8 +9906,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 535668033}
-        m_MethodName: PlayerJump
+      - m_Target: {fileID: 535668031}
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11470,8 +11467,6 @@ MonoBehaviour:
   upspeed_max: 210
   colevent_ground: {fileID: 1569851194}
   colevent_head: {fileID: 1578776345}
-  colevent_ass: {fileID: 1596257776}
-  colevent_forward: {fileID: 774348256}
   flipspeed: -170
   fliptime: 0
   attime: 0
