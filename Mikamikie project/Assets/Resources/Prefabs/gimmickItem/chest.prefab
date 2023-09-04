@@ -144,9 +144,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a55ad8f43d2c68949a2aa611418044bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effect: {fileID: 817983008206868522, guid: 318e7a793e0965943903f4ffac7d6720, type: 3}
+  groundeffect: {fileID: 817983008206868522, guid: 318e7a793e0965943903f4ffac7d6720,
+    type: 3}
   effect_pos: {fileID: 2815975306697201822}
   ground_se: {fileID: 8300000, guid: 038b94d5fd5879647b7a22f3edabe091, type: 3}
+  destroyeffect: {fileID: 5121345681269939502, guid: 99261c893d46a1e4c92a9bd5ba3d0f37,
+    type: 3}
+  itemeffect: {fileID: 7081578396968503013, guid: 6fc015081ab6e714c938b9c9d606b2c2,
+    type: 3}
+  itemList:
+  - itemsprite: {fileID: 21300000, guid: 6cfd59f247748044f933a28235a296a9, type: 3}
+    eventnum: 0
 --- !u!82 &2642768054740413693
 AudioSource:
   m_ObjectHideFlags: 0

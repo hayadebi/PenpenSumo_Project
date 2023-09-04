@@ -94,6 +94,7 @@ public class player : MonoBehaviour
     public Transform endcmpos;
     //NPCかどうか
     [SerializeField] private bool npc_ai = false;
+    private float nodamagetime = 0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -136,6 +137,7 @@ public class player : MonoBehaviour
                     nextframe_dash = false;
                     anim.SetInteger(number_name, dash_anim);
                 }
+                if (nodamagetime >= 0) nodamagetime -= Time.deltaTime;
                 //一部アニメーション
                 if (anim.GetInteger(number_name) == dash_anim && fliptime <= 0) { anim.SetInteger(number_name, stand_anim); movetrg = false; }
                 else if (anim.GetInteger(number_name) == at_anim && attime <= 0) { anim.SetInteger(number_name, stand_anim); movetrg = false; }
@@ -305,6 +307,12 @@ public class player : MonoBehaviour
         }
         else if (GManager.instance.over != -1 && audioSource.isPlaying) audioSource.Stop();
         //if (this.gameObject.name == "Player" && GManager.instance.over == 1 && anim.GetInteger(number_name) != jump_anim) { anim.SetInteger(number_name, jump_anim); audioSource.Stop(); jump_uptrg = true; }
+        if (GManager.instance.over == -1 && GManager.instance.walktrg && !colevent_ground.coltrg&&(capcol.isTrigger|| rb.constraints == (RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation)))//&&col.gameObject != colevent_ass.gameObject )
+        {
+            if (capcol.isTrigger) capcol.isTrigger = false;
+            if (rb.constraints == (RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation)) rb.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
+
+        }
     }
     public void PlayerAttack()
     {
@@ -325,7 +333,10 @@ public class player : MonoBehaviour
     {
         if ( colevent_ground.coltrg && player_stamina >= 1 && jump_cooltime <= 0 && fliptime <= 0 && anim.GetInteger(number_name) != dash_anim && anim.GetInteger(number_name) != at_anim && GManager.instance.walktrg && GManager.instance.over == -1)
         {
+            if (capcol.isTrigger) capcol.isTrigger = false;
+            if (rb.constraints == (RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation)) rb.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
             jump_cooltime = 0.3f;
+            
             var tmpscale = character.transform.localScale;
             if (flipspeed < 0) tmpscale.x = -0.6f;
             else if (flipspeed > 0) tmpscale.x = 0.6f;
@@ -347,7 +358,7 @@ public class player : MonoBehaviour
         {
             fliptime = 0.3f;
             flipcoomtime = 0.45f;
-            player_stamina -= 2;
+            player_stamina -= 1;
             anim.SetInteger(number_name, dash_anim);
             audioSource.PlayOneShot(escapese);
             nextframe_dash = true;
@@ -369,9 +380,9 @@ public class player : MonoBehaviour
         if ((tmp.x >= col.gameObject.transform.position.x && character.position.x < col.gameObject.transform.position.x)|| (tmp.x <= col.gameObject.transform.position.x && character.position.x > col.gameObject.transform.position.x)) return true;
         return false;
     }
-    private void OnTriggerEnter(Collider col)
+    private void OnTriggerStay(Collider col)
     {
-        if (GManager.instance.over==-1 &&!capcol.isTrigger && GManager.instance.walktrg &&  col.tag == "player" && ForwardCheck(col)&& attime<=0 && fliptime<=0 && col.gameObject.GetComponent<player>().attime>0&& x_speed==0)
+        if (GManager.instance.over==-1&&nodamagetime<=0 && GManager.instance.walktrg &&  col.tag == "player" && ForwardCheck(col)&& attime<=0 && fliptime<=0 && col.gameObject.GetComponent<player>().attime>0&& x_speed==0)
         {
             var tmp = this.transform.position - col.transform.position;
             player tmpplayer = col.gameObject.GetComponent<player>();
@@ -397,8 +408,9 @@ public class player : MonoBehaviour
             else if (flipspeed > 0) tmpscale.x = 0.6f;
             character.transform.localScale = tmpscale;
         }
-        else if (GManager.instance.over==-1 && GManager.instance.walktrg && col.tag == "player" && !ForwardCheck(col) && col.gameObject!=this.gameObject &&( col.gameObject.GetComponent<player>().attime > 0 || col.gameObject.GetComponent<player>().fliptime > 0||fliptime>0) &&x_speed==0)
+        else if (nodamagetime<=0 && GManager.instance.over==-1 && GManager.instance.walktrg && (col.tag == "player" || col.tag == "ass") && !ForwardCheck(col) &&x_speed==0 )
         {
+            nodamagetime = 1f;
             if(rb.constraints!= (RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation)) rb.constraints = RigidbodyConstraints.FreezePositionY|RigidbodyConstraints.FreezePositionZ| RigidbodyConstraints.FreezeRotation;
             if (!capcol.isTrigger) capcol.isTrigger = true;
         }
