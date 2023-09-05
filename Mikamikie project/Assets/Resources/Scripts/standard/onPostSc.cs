@@ -24,13 +24,13 @@ public class onPostSc : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (!motiontrg && _effect.intensity.value>0)
-        //{
-        //    _effect.intensity.value -= (Time.deltaTime * animspeed);
-        //}
-        //else if(motiontrg && _effect.intensity.value != 1)
-        //{
-        //    _effect.intensity.value =1;
-        //}
+        if (!motiontrg && _effect.intensity.value > 0)
+        {
+            _effect.intensity.value -= (Time.deltaTime * animspeed);
+        }
+        else if (motiontrg && _effect.intensity.value != 1)
+        {
+            _effect.intensity.value = 1;
+        }
     }
 }

@@ -95,6 +95,13 @@ public class player : MonoBehaviour
     //NPCかどうか
     [SerializeField] private bool npc_ai = false;
     private float nodamagetime = 0f;
+    //エフェクト関連の追加ステータス
+    [SerializeField] ItemManager itemmanager;
+    public float effect_jumpspeedup = 1f;
+    public float effect_powerup = 1f;
+    public bool effect_dummytrg = false;
+    private float notgroundtime = 0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -126,6 +133,7 @@ public class player : MonoBehaviour
         {
             if (GManager.instance.over == -1)
             {
+                
                 if (endcmpos != null && endcmpos.position.x != this.transform.position.x)
                 {
                     var tmp = endcmpos.position;
@@ -176,13 +184,15 @@ public class player : MonoBehaviour
             x_rotation = 0;
             y_rotation = 0;
             bool tmpzerotrg = true;
-            if (!jump_uptrg && !jump_slowtrg && flipcoomtime<=0 && attime <= 0) { y_speed = -gravity; tmpzerotrg = false; }
-            else if (!jump_uptrg && jump_slowtrg && flipcoomtime <= 0 && attime <= 0){ y_speed = -(gravity / slow_max); ; tmpzerotrg = false; }
+            if ((!jump_uptrg && !jump_slowtrg && flipcoomtime<=0 && attime <= 0 ) ||notgroundtime>=0.5f){ y_speed = -gravity; tmpzerotrg = false; }
+            else if ((!jump_uptrg && jump_slowtrg && flipcoomtime <= 0 && attime <= 0)||notgroundtime>=0.5f){ y_speed = -(gravity / slow_max); ; tmpzerotrg = false; }
             if (jump_uptrg && !jump_slowtrg && flipcoomtime <= 0 && attime <= 0)
             {
                 tmpzerotrg = false;
+                if (notgroundtime > 0) notgroundtime = 0;
                 y_speed = upspeed_max;
                 if (x_speed != 0) y_speed /= 2f;
+                y_speed *= effect_jumpspeedup;
                 jump_uptime += Time.deltaTime;
                 if (jump_uptime >= jump_maxuptime)
                 {
@@ -191,8 +201,10 @@ public class player : MonoBehaviour
                     jump_slowtrg = true;
                 }
             }
+            else if (!colevent_ground.coltrg) { notgroundtime += Time.deltaTime; tmpzerotrg = false; }
+            else if (colevent_ground.coltrg && notgroundtime > 0) { notgroundtime = 0; tmpzerotrg = false; }
             if (tmpzerotrg) y_speed = upspeed_max/12;
-            if (colevent_ground.coltrg && jump_slowtrg) { jump_slowtrg = false; onpost.motiontrg = false; }
+            if (colevent_ground.coltrg && jump_slowtrg) { jump_slowtrg = false; }//onpost.motiontrg = false; }
             if (colevent_ground.coltrg && Math.Abs(x_speed) <= 0.5f) { x_speed = 0; }
             if (!movetrg && attime <= 0 && fliptime <= 0 && !jump_slowtrg && !jump_uptrg && ((rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai)) || (leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai))))
             {
@@ -250,7 +262,7 @@ public class player : MonoBehaviour
             }
             else if (fliptime <= 0 && x_speed == 0)
             {
-                if (!jump_uptrg && onpost.motiontrg) onpost.motiontrg = false;
+                //if (!jump_uptrg && onpost.motiontrg) onpost.motiontrg = false;
                 if (fliptime <= 0 && (rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai)) && (jump_uptrg || jump_slowtrg)) { inputX = 0.7f; flipspeed = -(0.7f * 80); }
                 else if (fliptime <= 0 && (rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai))) { inputX = 1; flipspeed = -80; }
                 if (fliptime <= 0 && (leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai)) && (jump_uptrg || jump_slowtrg)) { inputX = -0.7f; flipspeed = 0.7f * 80; }
@@ -262,6 +274,7 @@ public class player : MonoBehaviour
             {
                 attime -= Time.deltaTime;
             }
+            inputX *= effect_jumpspeedup;
             var tempVc = new Vector3(move_num * inputX, 0, inputZ);
             if (tempVc.magnitude > 1) tempVc = tempVc.normalized;
             var vec = tempVc;
@@ -325,7 +338,7 @@ public class player : MonoBehaviour
             else if (flipspeed > 0) tmpscale.x = 0.6f;
             character.transform.localScale = tmpscale;
             anim.SetInteger(number_name, at_anim);
-            onpost.motiontrg = true;
+            //onpost.motiontrg = true;
             audioSource.PlayOneShot(attackse);
         }
     }
@@ -348,7 +361,7 @@ public class player : MonoBehaviour
                 player_stamina -= 1;
                 audioSource.PlayOneShot(jumpse);
             }
-            onpost.motiontrg = true;
+           // onpost.motiontrg = true;
             jump_uptrg = true;
         }
     }
@@ -367,7 +380,7 @@ public class player : MonoBehaviour
             Vector3 tmpdiff = tmp - transform.position;
             Quaternion tmpRotation = Quaternion.LookRotation(tmpdiff);
             Instantiate(dasheffect, transform.position, tmpRotation, transform);
-            onpost.motiontrg = true;
+            //onpost.motiontrg = true;
             var tmpscale = character.transform.localScale;
             if (flipspeed < 0) tmpscale.x = 0.6f;
             else if (flipspeed > 0) tmpscale.x = -0.6f;
@@ -386,7 +399,20 @@ public class player : MonoBehaviour
         {
             var tmp = this.transform.position - col.transform.position;
             player tmpplayer = col.gameObject.GetComponent<player>();
-            player_health -= tmpplayer.player_at;
+            player_health -= tmpplayer.player_at*(int)tmpplayer.effect_powerup;
+            //アイテムエフェクト処理含む
+            if (effect_jumpspeedup > 1)
+            {
+                effect_jumpspeedup = 1;
+                if (this.gameObject.name == "Player") itemmanager.player0_effectui[0].SetBool("Abool", true);
+                else if (this.gameObject.name == "Player (1)") itemmanager.player1_effectui[0].SetBool("Abool", true);
+            }
+            if (effect_powerup > 1)
+            {
+                effect_powerup = 1;
+                if (this.gameObject.name == "Player") itemmanager.player0_effectui[2].SetBool("Abool", true);
+                else if (this.gameObject.name == "Player (1)") itemmanager.player1_effectui[2].SetBool("Abool", true);
+            }
 
             var tmp2 = tmpplayer.gameObject.transform.position;
             tmp2.x += tmpplayer.flipspeed;
@@ -394,11 +420,17 @@ public class player : MonoBehaviour
             Quaternion tmpRotation = Quaternion.LookRotation(tmpdiff);
             Instantiate(damageeffect, this.transform.position, tmpRotation, this.transform);
 
-            if (player_health > 0) x_speed = tmp.x * 1600;
-            else { x_speed = tmp.x * 8000;
+            if (player_health > 0) x_speed = tmp.x * (1600 * tmpplayer.effect_powerup);
+            else if (!effect_dummytrg)
+            {
+                x_speed = tmp.x * 8000;
                 if (this.gameObject.name == "Player") GManager.instance.over = 1;
                 else if (this.gameObject.name == "Player (1)") GManager.instance.over = 2;
-               Instantiate(popuiobj, transform.position, transform.rotation); ;
+                Instantiate(popuiobj, transform.position, transform.rotation); ;
+            }
+            else if (effect_dummytrg)
+            {
+                DummyItem(this.gameObject, col.gameObject);
             }
             audioSource.PlayOneShot(damagese);
             anim.SetInteger(number_name, damage_anim);
@@ -424,6 +456,19 @@ public class player : MonoBehaviour
             if (rb.constraints == (RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation)) rb.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
             
         }
+    }
+
+    public void DummyItem(GameObject thisobj,GameObject colobj)
+    {
+        effect_dummytrg = false;
+        player_health = 5;
+        player_stamina = 10;
+        onpost.motiontrg = true;
+        var tmpcolpl = colobj.gameObject.transform.position;
+        colobj.gameObject.transform.position = thisobj.transform.position;
+        thisobj.transform.position = colobj.gameObject.transform.position;
+        if (thisobj.gameObject.name == "Player") itemmanager.player0_effectui[1].SetBool("Abool", true);
+        else if (thisobj.gameObject.name == "Player (1)") itemmanager.player1_effectui[1].SetBool("Abool", true);
     }
 
 }

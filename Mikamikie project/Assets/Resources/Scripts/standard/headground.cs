@@ -18,7 +18,7 @@ public class headground : MonoBehaviour
         if (boxcol.isTrigger)
         {
             noheadtime += Time.deltaTime;
-            if (noheadtime >= 2f)
+            if (noheadtime >= 1f)
             {
                 noheadtime = 0;
                 boxcol.isTrigger = false;

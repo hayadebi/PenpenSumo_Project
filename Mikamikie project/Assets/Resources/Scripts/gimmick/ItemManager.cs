@@ -11,6 +11,9 @@ public class ItemManager : MonoBehaviour
     public Transform[] area1;
     public Transform[] area2;
     private int areatype = 1;
+
+    public Animator[] player0_effectui;
+    public Animator[] player1_effectui;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,6 +35,7 @@ public class ItemManager : MonoBehaviour
                     var tmp = area1[0].position;
                     tmp.x = Random.Range(area1[0].position.x, area1[1].position.x);
                     onchest = Instantiate(chestobj, tmp, chestobj.transform.rotation);
+
                     GManager.instance.setrg = 5;
                 }
                 else if (areatype == 2)
@@ -41,6 +45,8 @@ public class ItemManager : MonoBehaviour
                     onchest = Instantiate(chestobj, tmp, chestobj.transform.rotation);
                     GManager.instance.setrg = 5;
                 }
+                ChestItem tmpchect = onchest.GetComponent<ChestItem>();
+                tmpchect.itemmanager = this.GetComponent<ItemManager>();
             }
         }
     }

@@ -16,7 +16,7 @@ public class GManager : MonoBehaviour
     public float audioMax = 0.16f;
     public float seMax = 0.08f;
     //[Header("モーションブラーをかけるかどうか")]
-    //public bool motion_trg = false;
+    public bool motion_trg = false;
    // [Header("回避と攻撃を兼用するかどうか")]
     //public bool at_and_dash = false;
     [Header("タイトルのアニメーションが有効かどうか")]

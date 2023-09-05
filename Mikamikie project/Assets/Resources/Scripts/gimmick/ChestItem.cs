@@ -19,10 +19,12 @@ public class ChestItem : MonoBehaviour
     [System.Serializable]
     public struct ItemList
     {
+        public string itemname;
         public Sprite itemsprite;
         public int eventnum;
     }
     public ItemList[] itemList;
+    public ItemManager itemmanager=null;
     // Start is called before the first frame update
     void Start()
     {
@@ -57,8 +59,29 @@ public class ChestItem : MonoBehaviour
             if (tmpobj.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>())
             {
                 tmpobj.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = itemList[tmprandom].itemsprite;
-                if (itemList[tmprandom].eventnum == 0) col.GetComponent<player>().player_health += 2;
-                if (col.GetComponent<player>().player_health > 5) col.GetComponent<player>().player_health = 5;
+                switch (itemList[tmprandom].eventnum)
+                {
+                    case 0:
+                        col.GetComponent<player>().player_health = 5;
+                        col.GetComponent<player>().player_stamina = 10;
+                        break;
+                    case 1:
+                        col.GetComponent<player>().effect_jumpspeedup = 1.5f;
+                        if (col.name == "Player") { itemmanager.player0_effectui[0].SetBool("Abool", false); itemmanager.player0_effectui[0].gameObject.SetActive(true); }
+                        else if (col.name == "Player (1)") { itemmanager.player1_effectui[0].SetBool("Abool", false); itemmanager.player1_effectui[0].gameObject.SetActive(true); }
+                        break;
+                    case 2:
+                        col.GetComponent<player>().effect_dummytrg = true; ;
+                        if (col.name == "Player") { itemmanager.player0_effectui[1].SetBool("Abool", false); itemmanager.player0_effectui[1].gameObject.SetActive(true); }
+                        else if (col.name == "Player (1)") { itemmanager.player1_effectui[1].SetBool("Abool", false); itemmanager.player1_effectui[1].gameObject.SetActive(true); }
+                        break;
+                    case 3:
+                        col.GetComponent<player>().effect_powerup = 2f;
+                        if (col.name == "Player") { itemmanager.player0_effectui[2].SetBool("Abool", false); itemmanager.player0_effectui[2].gameObject.SetActive(true); }
+                        else if (col.name == "Player (1)") { itemmanager.player1_effectui[2].SetBool("Abool", false); itemmanager.player1_effectui[2].gameObject.SetActive(true); }
+                        break;
+                }
+
                 Destroy(gameObject, 0.1f);
             }
 
