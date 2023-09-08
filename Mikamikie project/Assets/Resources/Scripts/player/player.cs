@@ -12,7 +12,7 @@ public class player : MonoBehaviour
     public int player_stamina = 20;
     public int player_at = 1;
     public int player_knockbackresistance = 40;
-    [SerializeField]private float player_speed = 2;//プレイヤーの速度
+    public float player_speed = 2;//プレイヤーの速度
     [SerializeField] private float gravity = 32;//重力値
     public Transform character;//プレイヤー本体、メインに対応するトランスフォーム
     [SerializeField] private Transform body;//プレイヤーのモデルに対応するトランスフォーム
@@ -78,7 +78,7 @@ public class player : MonoBehaviour
    // public ColEvent colevent_ass;
    // public ColEvent colevent_forward;
     //回避 攻撃
-    public float flipspeed = -170;
+    public float flipspeed = -60;
     public float fliptime = 0f;
     private float flipcoomtime = 0f;
     private onPostSc onpost;
@@ -210,10 +210,10 @@ public class player : MonoBehaviour
             {
                 //この部分では歩きの効果音、アニメーションを操作
                 movetrg = true;
-                var tmpscale = character.transform.localScale;
-                if (flipspeed < 0) tmpscale.x = 0.6f;
-                else if (flipspeed > 0) tmpscale.x = -0.6f;
-                character.transform.localScale = tmpscale;
+                //var tmpscale = character.transform.localScale;
+                //if (flipspeed < 0) tmpscale.x = 0.6f;
+                //else if (flipspeed > 0) tmpscale.x = -0.6f;
+                //character.transform.localScale = tmpscale;
                 audioSource.clip = groundse;
                 audioSource.loop = true;
                 audioSource.Play();
@@ -241,10 +241,10 @@ public class player : MonoBehaviour
             if ((anim.GetInteger(number_name) == stand_anim || anim.GetInteger(number_name) == walk_anim) && !colevent_ground.coltrg)
             {
                 anim.SetInteger(number_name, jump_anim);
-                var tmpscale = character.transform.localScale;
-                if (flipspeed < 0) tmpscale.x = -0.6f;
-                else if (flipspeed > 0) tmpscale.x = 0.6f;
-                character.transform.localScale = tmpscale;
+                //var tmpscale = character.transform.localScale;
+                //if (flipspeed < 0) tmpscale.x = -0.6f;
+                //else if (flipspeed > 0) tmpscale.x = 0.6f;
+                //character.transform.localScale = tmpscale;
             }
             else if (anim.GetInteger(number_name) == jump_anim && colevent_ground.coltrg) anim.SetInteger(number_name, stand_anim);
             if (anim.GetInteger(number_name) == damage_anim && x_speed == 0 && colevent_ground.coltrg) anim.SetInteger(number_name, stand_anim);
@@ -263,10 +263,10 @@ public class player : MonoBehaviour
             else if (fliptime <= 0 && x_speed == 0)
             {
                 //if (!jump_uptrg && onpost.motiontrg) onpost.motiontrg = false;
-                if (fliptime <= 0 && (rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai)) && (jump_uptrg || jump_slowtrg)) { inputX = 0.7f; flipspeed = -(0.7f * 80); }
-                else if (fliptime <= 0 && (rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai))) { inputX = 1; flipspeed = -80; }
-                if (fliptime <= 0 && (leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai)) && (jump_uptrg || jump_slowtrg)) { inputX = -0.7f; flipspeed = 0.7f * 80; }
-                else if (fliptime <= 0 && (leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai))) { inputX = -1; flipspeed = 80; }
+                if (fliptime <= 0 && (rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai)) && (jump_uptrg || jump_slowtrg)) { inputX = 0.7f; flipspeed = 60; }
+                else if (fliptime <= 0 && (rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai))) { inputX = 1; flipspeed = 60; }
+                if (fliptime <= 0 && (leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai)) && (jump_uptrg || jump_slowtrg)) { inputX = -0.7f; flipspeed = -60; }
+                else if (fliptime <= 0 && (leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai))) { inputX = -1; flipspeed = -60; }
 
                 if (attime > 0 ) inputX /= 2;
             }
@@ -282,23 +282,23 @@ public class player : MonoBehaviour
             rb.velocity = movevec;
             Vector3 targetPositon = latest_pos;
             // 高さがずれていると体ごと上下を向いてしまうので便宜的に高さを統一
-            if (character.transform.position.y != latest_pos.y)
-                targetPositon = new Vector3(latest_pos.x, character.transform.position.y, latest_pos.z);
-            Vector3 diff = character.transform.position - targetPositon;
-            if (diff != Vector3.zero && ((leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai)) || (rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai))))
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(diff);
-                character.transform.rotation = Quaternion.Slerp(character.transform.rotation, targetRotation, Time.deltaTime * kando);
-            }
-            latest_pos = character.transform.position;  //前回のPositionの更新
+            //if (character.transform.position.y != latest_pos.y)
+            //    targetPositon = new Vector3(latest_pos.x, character.transform.position.y, latest_pos.z);
+            //Vector3 diff = character.transform.position - targetPositon;
+            //if (diff != Vector3.zero && fliptime>0 && ((leftbtn.push || (Input.GetKey(KeyCode.A) && !npc_ai)) || (rightbtn.push || (Input.GetKey(KeyCode.D) && !npc_ai))))
+            //{
+            //    Quaternion targetRotation = Quaternion.LookRotation(diff);
+            //    character.transform.rotation = Quaternion.Slerp(character.transform.rotation, targetRotation, Time.deltaTime * kando);
+            //}
+            //latest_pos = character.transform.position;  //前回のPositionの更新
 
             if (movetrg && !(leftbtn.push || Input.GetKey(KeyCode.A)) && !(rightbtn.push || Input.GetKey(KeyCode.D)) && fliptime <= 0 && colevent_ground.coltrg)
             {
                 movetrg = false;
-                var tmpscale = character.transform.localScale;
-                if (flipspeed < 0) tmpscale.x = -0.6f;
-                else if (flipspeed > 0) tmpscale.x = 0.6f;
-                character.transform.localScale = tmpscale;
+                //var tmpscale = character.transform.localScale;
+                //if (flipspeed < 0) tmpscale.x = 0.6f;
+                //else if (flipspeed > 0) tmpscale.x = -0.6f;
+                //character.transform.localScale = tmpscale;
                 if (attime <= 0&&fliptime<=0) anim.SetInteger(number_name, stand_anim);
                 audioSource.loop = false;
                 if (jump_cooltime <= 0) audioSource.Stop();
@@ -333,10 +333,10 @@ public class player : MonoBehaviour
         {
             attime = 0.45f;
             player_stamina -= 2;
-            var tmpscale = character.transform.localScale;
-            if (flipspeed < 0) tmpscale.x = -0.6f;
-            else if (flipspeed > 0) tmpscale.x = 0.6f;
-            character.transform.localScale = tmpscale;
+            //var tmpscale = character.transform.localScale;
+            //if (flipspeed < 0) tmpscale.x = -0.6f;
+            //else if (flipspeed > 0) tmpscale.x = 0.6f;
+            //character.transform.localScale = tmpscale;
             anim.SetInteger(number_name, at_anim);
             //onpost.motiontrg = true;
             audioSource.PlayOneShot(attackse);
@@ -350,10 +350,10 @@ public class player : MonoBehaviour
             if (rb.constraints == (RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation)) rb.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
             jump_cooltime = 0.3f;
             
-            var tmpscale = character.transform.localScale;
-            if (flipspeed < 0) tmpscale.x = -0.6f;
-            else if (flipspeed > 0) tmpscale.x = 0.6f;
-            character.transform.localScale = tmpscale;
+            //var tmpscale = character.transform.localScale;
+            //if (flipspeed < 0) tmpscale.x = -0.6f;
+            //else if (flipspeed > 0) tmpscale.x = 0.6f;
+            //character.transform.localScale = tmpscale;
             anim.SetInteger(number_name, jump_anim);
             Instantiate(jumpeffect, transform.position, transform.rotation);
             if (x_speed == 0)
@@ -372,30 +372,34 @@ public class player : MonoBehaviour
             fliptime = 0.3f;
             flipcoomtime = 0.45f;
             player_stamina -= 1;
-            anim.SetInteger(number_name, dash_anim);
+            
             audioSource.PlayOneShot(escapese);
             nextframe_dash = true;
             var tmp = transform.position;
-            tmp.x += flipspeed;
+            if (flipspeed > 0) { tmp.x += 100; }
+            else if (flipspeed< 0) { tmp.x -= 100; }
+            anim.SetInteger(number_name, dash_anim);
             Vector3 tmpdiff = tmp - transform.position;
             Quaternion tmpRotation = Quaternion.LookRotation(tmpdiff);
             Instantiate(dasheffect, transform.position, tmpRotation, transform);
             //onpost.motiontrg = true;
             var tmpscale = character.transform.localScale;
-            if (flipspeed < 0) tmpscale.x = 0.6f;
-            else if (flipspeed > 0) tmpscale.x = -0.6f;
+            if (flipspeed < 0) tmpscale.x = 0.6f;  
+            else if (flipspeed >= 0) tmpscale.x = -0.6f;
+            tmpscale.z *= -1;
             character.transform.localScale = tmpscale;
         }
     }
-    private bool ForwardCheck(Collider col)
+    public bool ForwardCheck(Collider col)
     {
         var tmp = character.position+(-character.forward*9999);
-        if ((tmp.x >= col.gameObject.transform.position.x && character.position.x < col.gameObject.transform.position.x)|| (tmp.x <= col.gameObject.transform.position.x && character.position.x > col.gameObject.transform.position.x)) return true;
+        if (Math.Abs(col.gameObject.transform.position.x-tmp.x)>0.1f &&((tmp.x > col.gameObject.transform.position.x && character.position.x < col.gameObject.transform.position.x)|| (tmp.x < col.gameObject.transform.position.x && character.position.x > col.gameObject.transform.position.x))) return true;
         return false;
     }
     private void OnTriggerStay(Collider col)
     {
-        if (GManager.instance.over==-1&&nodamagetime<=0 && GManager.instance.walktrg &&  col.tag == "player" && ForwardCheck(col)&& attime<=0 && fliptime<=0 && col.gameObject.GetComponent<player>().attime>0&& x_speed==0)
+        //後ろダメージ
+        if (GManager.instance.over==-1 && GManager.instance.walktrg &&  col.tag == "player" && ForwardCheck(col) && col.gameObject.GetComponent<player>().ForwardCheck(this.gameObject.GetComponent<Collider>())&& attime<=0 && fliptime<=0 && col.gameObject.GetComponent<player>().attime>0&& x_speed==0)
         {
             var tmp = this.transform.position - col.transform.position;
             player tmpplayer = col.gameObject.GetComponent<player>();
@@ -435,14 +439,57 @@ public class player : MonoBehaviour
             audioSource.PlayOneShot(damagese);
             anim.SetInteger(number_name, damage_anim);
             Instantiate(damageeffect, transform.position, transform.rotation);
-            var tmpscale = character.transform.localScale;
-            if (flipspeed < 0) tmpscale.x = -0.6f;
-            else if (flipspeed > 0) tmpscale.x = 0.6f;
-            character.transform.localScale = tmpscale;
         }
-        else if (nodamagetime<=0 && GManager.instance.over==-1 && GManager.instance.walktrg && (col.tag == "player" || col.tag == "ass") && !ForwardCheck(col) &&x_speed==0 )
+        ////前ダメージ
+        //if (GManager.instance.over == -1 && nodamagetime <= 0 && GManager.instance.walktrg && col.tag == "player" && !ForwardCheck(col) && attime <= 0 && fliptime <= 0 && col.gameObject.GetComponent<player>().attime > 0 && x_speed == 0)
+        //{
+        //    var tmp = this.transform.position - col.transform.position;
+        //    player tmpplayer = col.gameObject.GetComponent<player>();
+        //    player_health -= (tmpplayer.player_at-1) * (int)tmpplayer.effect_powerup;
+        //    //アイテムエフェクト処理含む
+        //    if (effect_jumpspeedup > 1)
+        //    {
+        //        effect_jumpspeedup = 1;
+        //        if (this.gameObject.name == "Player") itemmanager.player0_effectui[0].SetBool("Abool", true);
+        //        else if (this.gameObject.name == "Player (1)") itemmanager.player1_effectui[0].SetBool("Abool", true);
+        //    }
+        //    if (effect_powerup > 1)
+        //    {
+        //        effect_powerup = 1;
+        //        if (this.gameObject.name == "Player") itemmanager.player0_effectui[2].SetBool("Abool", true);
+        //        else if (this.gameObject.name == "Player (1)") itemmanager.player1_effectui[2].SetBool("Abool", true);
+        //    }
+
+        //    var tmp2 = tmpplayer.gameObject.transform.position;
+        //    tmp2.x += tmpplayer.flipspeed;
+        //    Vector3 tmpdiff = tmpplayer.gameObject.transform.position - tmp2;
+        //    Quaternion tmpRotation = Quaternion.LookRotation(tmpdiff);
+        //    Instantiate(damageeffect, this.transform.position, tmpRotation, this.transform);
+
+        //    if (player_health > 0) x_speed = tmp.x * (600 * tmpplayer.effect_powerup);
+        //    else if (!effect_dummytrg)
+        //    {
+        //        x_speed = tmp.x * 4000;
+        //        if (this.gameObject.name == "Player") GManager.instance.over = 1;
+        //        else if (this.gameObject.name == "Player (1)") GManager.instance.over = 2;
+        //        Instantiate(popuiobj, transform.position, transform.rotation); ;
+        //    }
+        //    else if (effect_dummytrg)
+        //    {
+        //        DummyItem(this.gameObject, col.gameObject);
+        //    }
+        //    audioSource.PlayOneShot(damagese);
+        //    anim.SetInteger(number_name, damage_anim);
+        //    Instantiate(damageeffect, transform.position, transform.rotation);
+        //    var tmpscale = character.transform.localScale;
+        //    if (flipspeed < 0) tmpscale.x = 0.6f;
+        //    else if (flipspeed >= 0) tmpscale.x = -0.6f;
+        //    tmpscale.z *= -1;
+        //    character.transform.localScale = tmpscale;
+        //}
+        else if (nodamagetime<=0 && GManager.instance.over==-1 && GManager.instance.walktrg && (col.tag == "player") && (attime<=0||fliptime>0|| !ForwardCheck(col))&&x_speed==0 )
         {
-            nodamagetime = 1f;
+            nodamagetime = 0.5f;
             if(rb.constraints!= (RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation)) rb.constraints = RigidbodyConstraints.FreezePositionY|RigidbodyConstraints.FreezePositionZ| RigidbodyConstraints.FreezeRotation;
             if (!capcol.isTrigger) capcol.isTrigger = true;
         }
@@ -450,18 +497,24 @@ public class player : MonoBehaviour
     }
     private void OnTriggerExit(Collider col)
     {
-        if (GManager.instance.over==-1 && GManager.instance.walktrg && col.tag == "player" && col.gameObject != this.gameObject)//&&col.gameObject != colevent_ass.gameObject )
+        if (GManager.instance.over==-1 && GManager.instance.walktrg && (col.tag == "player" ) && col.gameObject != this.gameObject)//&&col.gameObject != colevent_ass.gameObject )
         {
             if (capcol.isTrigger) capcol.isTrigger = false;
             if (rb.constraints == (RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation)) rb.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
             
         }
     }
-
+    public void FlipRot()
+    {
+        var tmpscale = character.transform.localScale;
+        if (flipspeed < 0) tmpscale.x = -0.6f;
+        else if (flipspeed > 0) tmpscale.x = 0.6f;
+        character.transform.localScale = tmpscale;
+    }
     public void DummyItem(GameObject thisobj,GameObject colobj)
     {
         effect_dummytrg = false;
-        player_health = 5;
+        player_health = 10;
         player_stamina = 10;
         onpost.motiontrg = true;
         var tmpcolpl = colobj.gameObject.transform.position;

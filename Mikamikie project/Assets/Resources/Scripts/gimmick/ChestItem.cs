@@ -22,6 +22,7 @@ public class ChestItem : MonoBehaviour
         public string itemname;
         public Sprite itemsprite;
         public int eventnum;
+        
     }
     public ItemList[] itemList;
     public ItemManager itemmanager=null;

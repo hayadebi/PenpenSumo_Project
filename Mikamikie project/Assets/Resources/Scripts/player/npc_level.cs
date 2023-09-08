@@ -154,7 +154,7 @@ public class npc_level : MonoBehaviour
     {
         if (rightbtn.push) rightbtn.push = false;
         else if (leftbtn.push) leftbtn.push = false;
-       
+        if (!pl.ForwardCheck(enemy.gameObject.GetComponent<Collider>())) pl.PlayerDash();
     }
 
     private bool ForwardCheckRight(GameObject col)
