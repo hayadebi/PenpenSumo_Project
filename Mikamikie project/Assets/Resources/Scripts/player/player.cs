@@ -8,9 +8,9 @@ public class player : MonoBehaviour
 {
     private bool stoptrg = false;//優先度高めにプレイヤーを停止させるトリガー
     //ステータス、アイテムでいじれる系
-    public int player_health = 20;
+    public float player_health = 20;
     public int player_stamina = 20;
-    public int player_at = 1;
+    public float player_at = 1;
     public int player_knockbackresistance = 40;
     public float player_speed = 2;//プレイヤーの速度
     [SerializeField] private float gravity = 32;//重力値
@@ -393,7 +393,7 @@ public class player : MonoBehaviour
     public bool ForwardCheck(Collider col)
     {
         var tmp = character.position+(-character.forward*9999);
-        if (Math.Abs(col.gameObject.transform.position.x-tmp.x)>0.1f &&((tmp.x > col.gameObject.transform.position.x && character.position.x < col.gameObject.transform.position.x)|| (tmp.x < col.gameObject.transform.position.x && character.position.x > col.gameObject.transform.position.x))) return true;
+        if (Math.Abs(col.gameObject.transform.position.x-tmp.x)>=0.1f &&((tmp.x > col.gameObject.transform.position.x && character.position.x < col.gameObject.transform.position.x)|| (tmp.x < col.gameObject.transform.position.x && character.position.x > col.gameObject.transform.position.x))) return true;
         return false;
     }
     private void OnTriggerStay(Collider col)
@@ -403,7 +403,7 @@ public class player : MonoBehaviour
         {
             var tmp = this.transform.position - col.transform.position;
             player tmpplayer = col.gameObject.GetComponent<player>();
-            player_health -= tmpplayer.player_at*(int)tmpplayer.effect_powerup;
+            player_health -= tmpplayer.player_at*tmpplayer.effect_powerup;
             //アイテムエフェクト処理含む
             if (effect_jumpspeedup > 1)
             {
@@ -436,58 +436,63 @@ public class player : MonoBehaviour
             {
                 DummyItem(this.gameObject, col.gameObject);
             }
+            var tmpscale = character.transform.localScale;
+            if (flipspeed < 0) tmpscale.x = 0.6f;
+            else if (flipspeed >= 0) tmpscale.x = -0.6f;
+            tmpscale.z *= -1;
+            character.transform.localScale = tmpscale;
             audioSource.PlayOneShot(damagese);
             anim.SetInteger(number_name, damage_anim);
             Instantiate(damageeffect, transform.position, transform.rotation);
         }
         ////前ダメージ
-        //if (GManager.instance.over == -1 && nodamagetime <= 0 && GManager.instance.walktrg && col.tag == "player" && !ForwardCheck(col) && attime <= 0 && fliptime <= 0 && col.gameObject.GetComponent<player>().attime > 0 && x_speed == 0)
-        //{
-        //    var tmp = this.transform.position - col.transform.position;
-        //    player tmpplayer = col.gameObject.GetComponent<player>();
-        //    player_health -= (tmpplayer.player_at-1) * (int)tmpplayer.effect_powerup;
-        //    //アイテムエフェクト処理含む
-        //    if (effect_jumpspeedup > 1)
-        //    {
-        //        effect_jumpspeedup = 1;
-        //        if (this.gameObject.name == "Player") itemmanager.player0_effectui[0].SetBool("Abool", true);
-        //        else if (this.gameObject.name == "Player (1)") itemmanager.player1_effectui[0].SetBool("Abool", true);
-        //    }
-        //    if (effect_powerup > 1)
-        //    {
-        //        effect_powerup = 1;
-        //        if (this.gameObject.name == "Player") itemmanager.player0_effectui[2].SetBool("Abool", true);
-        //        else if (this.gameObject.name == "Player (1)") itemmanager.player1_effectui[2].SetBool("Abool", true);
-        //    }
+        else if (GManager.instance.over == -1 && GManager.instance.walktrg && col.tag == "player" && !ForwardCheck(col) && col.gameObject.GetComponent<player>().ForwardCheck(this.gameObject.GetComponent<Collider>()) && attime <= 0 && fliptime <= 0 && col.gameObject.GetComponent<player>().attime > 0 && x_speed == 0)
+        {
+            var tmp = this.transform.position - col.transform.position;
+            player tmpplayer = col.gameObject.GetComponent<player>();
+            player_health -= (tmpplayer.player_at-1.5f) * tmpplayer.effect_powerup;
+            //アイテムエフェクト処理含む
+            if (effect_jumpspeedup > 1)
+            {
+                effect_jumpspeedup = 1;
+                if (this.gameObject.name == "Player") itemmanager.player0_effectui[0].SetBool("Abool", true);
+                else if (this.gameObject.name == "Player (1)") itemmanager.player1_effectui[0].SetBool("Abool", true);
+            }
+            if (effect_powerup > 1)
+            {
+                effect_powerup = 1;
+                if (this.gameObject.name == "Player") itemmanager.player0_effectui[2].SetBool("Abool", true);
+                else if (this.gameObject.name == "Player (1)") itemmanager.player1_effectui[2].SetBool("Abool", true);
+            }
 
-        //    var tmp2 = tmpplayer.gameObject.transform.position;
-        //    tmp2.x += tmpplayer.flipspeed;
-        //    Vector3 tmpdiff = tmpplayer.gameObject.transform.position - tmp2;
-        //    Quaternion tmpRotation = Quaternion.LookRotation(tmpdiff);
-        //    Instantiate(damageeffect, this.transform.position, tmpRotation, this.transform);
+            var tmp2 = tmpplayer.gameObject.transform.position;
+            tmp2.x += tmpplayer.flipspeed;
+            Vector3 tmpdiff = tmpplayer.gameObject.transform.position - tmp2;
+            Quaternion tmpRotation = Quaternion.LookRotation(tmpdiff);
+            Instantiate(damageeffect, this.transform.position, tmpRotation, this.transform);
 
-        //    if (player_health > 0) x_speed = tmp.x * (600 * tmpplayer.effect_powerup);
-        //    else if (!effect_dummytrg)
-        //    {
-        //        x_speed = tmp.x * 4000;
-        //        if (this.gameObject.name == "Player") GManager.instance.over = 1;
-        //        else if (this.gameObject.name == "Player (1)") GManager.instance.over = 2;
-        //        Instantiate(popuiobj, transform.position, transform.rotation); ;
-        //    }
-        //    else if (effect_dummytrg)
-        //    {
-        //        DummyItem(this.gameObject, col.gameObject);
-        //    }
-        //    audioSource.PlayOneShot(damagese);
-        //    anim.SetInteger(number_name, damage_anim);
-        //    Instantiate(damageeffect, transform.position, transform.rotation);
-        //    var tmpscale = character.transform.localScale;
-        //    if (flipspeed < 0) tmpscale.x = 0.6f;
-        //    else if (flipspeed >= 0) tmpscale.x = -0.6f;
-        //    tmpscale.z *= -1;
-        //    character.transform.localScale = tmpscale;
-        //}
-        else if (nodamagetime<=0 && GManager.instance.over==-1 && GManager.instance.walktrg && (col.tag == "player") && (attime<=0||fliptime>0|| !ForwardCheck(col))&&x_speed==0 )
+            if (player_health > 0) x_speed = tmp.x * (400 * tmpplayer.effect_powerup);
+            else if (!effect_dummytrg)
+            {
+                x_speed = tmp.x * 8000;
+                if (this.gameObject.name == "Player") GManager.instance.over = 1;
+                else if (this.gameObject.name == "Player (1)") GManager.instance.over = 2;
+                Instantiate(popuiobj, transform.position, transform.rotation); ;
+            }
+            else if (effect_dummytrg)
+            {
+                DummyItem(this.gameObject, col.gameObject);
+            }
+            var tmpscale = character.transform.localScale;
+            if (flipspeed < 0) tmpscale.x = 0.6f;
+            else if (flipspeed >= 0) tmpscale.x = -0.6f;
+            tmpscale.z *= -1;
+            character.transform.localScale = tmpscale;
+            audioSource.PlayOneShot(damagese);
+            anim.SetInteger(number_name, damage_anim);
+            Instantiate(damageeffect, transform.position, transform.rotation);
+        }
+        else if (nodamagetime<=0 && GManager.instance.over==-1 && GManager.instance.walktrg && (col.tag == "player") &&x_speed==0 &&((attime<=0&&!(!ForwardCheck(col) && col.gameObject.GetComponent<player>().ForwardCheck(this.gameObject.GetComponent<Collider>()))&&!(ForwardCheck(col) && !col.gameObject.GetComponent<player>().ForwardCheck(this.gameObject.GetComponent<Collider>())) && !(ForwardCheck(col) && col.gameObject.GetComponent<player>().ForwardCheck(this.gameObject.GetComponent<Collider>())))||fliptime>0))
         {
             nodamagetime = 0.5f;
             if(rb.constraints!= (RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation)) rb.constraints = RigidbodyConstraints.FreezePositionY|RigidbodyConstraints.FreezePositionZ| RigidbodyConstraints.FreezeRotation;

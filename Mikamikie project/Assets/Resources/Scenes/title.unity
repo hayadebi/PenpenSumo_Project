@@ -10372,11 +10372,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: a82dd0906b44c594e93803e77e0df973, type: 3}
-    m_FontSize: 28
+    m_FontSize: 26
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 3
-    m_MaxSize: 40
+    m_MinSize: 2
+    m_MaxSize: 88
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -10405,7 +10405,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EnglishText: 
-  englishFontSize: 24
+  englishFontSize: 28
   nosetTrg: 0
   textimage: {fileID: 0}
   textsprite: {fileID: 0}

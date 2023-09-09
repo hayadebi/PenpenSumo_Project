@@ -29,7 +29,30 @@ public class npc_level : MonoBehaviour
     {
         if (GManager.instance.walktrg && GManager.instance.over == -1 && cooltime<=0)
         {
-            if (GManager.instance.difficulty_mode == 0)
+            if (GManager.instance.difficulty_mode == 3)
+            {
+                if (npc && player && !rightbtn.push && ForwardCheckRight(player) && !((rightbtn.push || leftbtn.push) && Mathf.Abs(pl.character.position.x - player.transform.position.x) <= 10f))
+                {
+                    rightbtn.push = true;
+                    leftbtn.push = false;
+                    tmpcooltime = 2;
+                    Invoke(nameof(CoolTimeSet), 2f);
+                }
+                else if (npc && player && !leftbtn.push && ForwardCheckLeft(player) && !((rightbtn.push || leftbtn.push) && Mathf.Abs(pl.character.position.x - player.transform.position.x) <= 10f))
+                {
+                    rightbtn.push = false;
+                    leftbtn.push = true;
+                    tmpcooltime = 2;
+                    Invoke(nameof(CoolTimeSet), 2f);
+                }
+                else if ((rightbtn.push || leftbtn.push) && ((Mathf.Abs(pl.gameObject.transform.position.x - player.transform.position.x) <= 10f && Mathf.Abs(pl.gameObject.transform.position.y - player.transform.position.y) <= 10f) || (Mathf.Abs(pl.gameObject.transform.position.x - player.transform.position.x) <= 40f && Mathf.Abs(pl.gameObject.transform.position.y - player.transform.position.y) > 10f)))
+                {
+                    cooltime = 1f;
+                    if (rightbtn.push) rightbtn.push = false;
+                    else if (leftbtn.push) leftbtn.push = false;
+                }
+            }
+            else if (GManager.instance.difficulty_mode == 0)
             {
                 if (npc && player && !rightbtn.push && ForwardCheckRight(player) && !((rightbtn.push || leftbtn.push) && Mathf.Abs(pl.character.position.x - player.transform.position.x) <= 10f))
                 {
@@ -53,7 +76,7 @@ public class npc_level : MonoBehaviour
                 }
                 if (cooltime <= 0 && Mathf.Abs(pl.gameObject.transform.position.x - player.transform.position.x) <= 30f && Mathf.Abs(pl.gameObject.transform.position.y - player.transform.position.y) <= 10f)
                 {
-                    cooltime = 5f;
+                    cooltime = 6f;
                     StopMove();
                     pl.PlayerAttack();
                 }
@@ -84,7 +107,7 @@ public class npc_level : MonoBehaviour
                 }
                 else if (pl.fliptime <= 0&&cooltime <= 0 && Mathf.Abs(pl.gameObject.transform.position.x - player.transform.position.x) <= 25f && Mathf.Abs(pl.gameObject.transform.position.y - player.transform.position.y) <= 15f)
                 {
-                    cooltime = 4f;
+                    cooltime = 5f;
                     StopMove();
                     pl.PlayerAttack();
                 }
@@ -127,7 +150,7 @@ public class npc_level : MonoBehaviour
                 }
                 else if (pl.fliptime<=0&&cooltime <= 0 && Mathf.Abs(pl.gameObject.transform.position.x - player.transform.position.x) <= 25f && Mathf.Abs(pl.gameObject.transform.position.y - player.transform.position.y) <= 15f)
                 {
-                    cooltime = 3f;
+                    cooltime = 4f;
                     StopMove();
                     pl.PlayerAttack();
                 }
